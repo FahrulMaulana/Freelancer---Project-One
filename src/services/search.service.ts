@@ -13,91 +13,6 @@ export class SearchService {
 
   constructor(private redisService: RedisService) {}
 
-  // async search(searchQuery: SearchQueryDto): Promise<{
-  //   data: Business[]
-  //   total: number
-  //   page: number
-  //   limit: number | undefined
-  //   query: string
-  // }> {
-  //   const { q, category, subcategory, limit, offset, sortBy } = searchQuery
-
-  //   // Tokenize search query
-  //   const searchTerms = this.tokenizeQuery(q)
-
-  //   // Get business IDs from search indexes
-  //   let searchResults: Set<string> = new Set()
-
-  //   for (const term of searchTerms) {
-  //     const businessIds = await this.redisService.smembers(`${this.SEARCH_INDEX_KEY}:${term}`)
-  //     if (searchResults.size === 0) {
-  //       searchResults = new Set(businessIds)
-  //     } else {
-  //       // Intersection for AND search
-  //       searchResults = new Set(businessIds.filter((id) => searchResults.has(id)))
-  //     }
-  //   }
-
-  //   let finalResults = Array.from(searchResults)
-
-  //   // Apply category filter
-  //   if (category) {
-  //     const categoryBusinessIds = await this.redisService.smembers(`${this.CATEGORY_INDEX_KEY}:${category}`)
-  //     finalResults = finalResults.filter((id) => categoryBusinessIds.includes(id))
-  //   }
-
-  //   // Apply subcategory filter
-  //   if (subcategory) {
-  //     const subcategoryBusinessIds = await this.redisService.smembers(`${this.SUBCATEGORY_INDEX_KEY}:${subcategory}`)
-  //     finalResults = finalResults.filter((id) => subcategoryBusinessIds.includes(id))
-  //   }
-
-  //   // Get business data and calculate relevance scores
-  //   const businesses: (Business & { relevanceScore: number })[] = []
-
-  //   for (const id of finalResults) {
-  //     const businessData = await this.redisService.hget(`${this.BUSINESS_KEY}:${id}`, 'data')
-  //     if (businessData) {
-  //       const business = JSON.parse(businessData)
-  //       const relevanceScore = this.calculateRelevanceScore(business, searchTerms)
-  //       businesses.push({ ...business, relevanceScore })
-  //     }
-  //   }
-
-  //   // Sort businesses
-  //   businesses.sort((a, b) => {
-  //     switch (sortBy) {
-  //       case 'relevance':
-  //         return b.relevanceScore - a.relevanceScore
-  //       case 'name':
-  //         return a.name.localeCompare(b.name)
-  //       case 'rating':
-  //         return b.rating - a.rating
-  //       case 'createdAt':
-  //         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  //       default:
-  //         return b.relevanceScore - a.relevanceScore
-  //     }
-  //   })
-
-  //   const total = businesses.length
-  //   const page = Math.floor((offset ?? 0) / (limit ?? 1)) + 1
-  //   const paginatedBusinesses = businesses.slice(offset ?? 0, (offset ?? 0) + (limit ?? businesses.length))
-
-  //   // Remove relevanceScore from response
-  //   const cleanBusinesses = paginatedBusinesses.map(({ relevanceScore, ...business }) => business)
-
-  //   return {
-  //     data: cleanBusinesses,
-  //     total,
-  //     page,
-  //     limit,
-  //     query: q,
-  //   }
-  // }
-
-  // Tambahkan impor interface Category jika belum ada
-
   // Ubah tipe return dari fungsi search untuk menyertakan kategori
   async search(searchQuery: SearchQueryDto): Promise<{
     data: Business[]
@@ -232,7 +147,7 @@ export class SearchService {
             icon: category.icon,
             count: businessCount,
             description: category.description,
-          }
+          } as CategoryWithCount // Tambahkan type assertion di sini
         }
       } catch (err) {
         console.error(`Error parsing category data for ${categoryId}:`, err)
@@ -242,7 +157,10 @@ export class SearchService {
     })
 
     const categoryResults = await Promise.all(categoryPromises)
-    matchingCategories.push(...categoryResults.filter((result) => result !== null))
+
+    // Perbaikan: Filter item null terlebih dahulu dan gunakan type assertion
+    const filteredResults = categoryResults.filter((result): result is CategoryWithCount => result !== null)
+    matchingCategories.push(...filteredResults)
 
     // Sort categories by relevance and business count
     matchingCategories.sort((a, b) => {
@@ -371,6 +289,7 @@ export class SearchService {
     return suggestions
   }
 
+  // Solusi untuk error di getBusinessNameSuggestions
   private async getBusinessNameSuggestions(query: string): Promise<Array<{ term: string; score: number }>> {
     const suggestions: Array<{ term: string; score: number }> = []
 
@@ -399,7 +318,11 @@ export class SearchService {
       })
 
       const businessResults = await Promise.all(businessPromises)
-      suggestions.push(...businessResults.filter((result) => result !== null))
+
+      // Perbaikan dengan type predicate
+      const filteredResults = businessResults.filter((result): result is { term: string; score: number } => result !== null)
+
+      suggestions.push(...filteredResults)
     } catch (error) {
       console.error('Error getting business name suggestions:', error)
     }
