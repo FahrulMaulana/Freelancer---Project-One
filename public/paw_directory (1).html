@@ -1,0 +1,3594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAW Directory - Local Business Listings</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUEFXIERpcmVjdG9yeSIsInNob3J0X25hbWUiOiJQQVciLCJzdGFydF91cmwiOiIvIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJ0aGVtZV9jb2xvciI6IiM2MzY2ZjEiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2ZmZmZmZiJ9">
+    
+    <!-- External Libraries -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --border: #e2e8f0;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+            padding-bottom: 90px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 20px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            border-radius: 0 0 25px 25px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            font-size: 28px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .search-input:focus {
+            background: white;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            display: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .search-clear:hover {
+            background: var(--border);
+        }
+
+        /* Search Results */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 200;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .search-result-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .search-result-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .search-result-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .search-result-meta {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .search-highlight {
+            background: rgba(99, 102, 241, 0.2);
+            padding: 1px 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Page */
+        .welcome-section {
+            padding: 30px 20px 20px;
+            background: var(--bg-secondary);
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-text h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .welcome-text p {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover::before {
+            transform: translateY(0);
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .category-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .category-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .category-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .subcategories {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Listings Page */
+        .listings-header {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .back-btn:hover {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .listings-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .listings-subtitle {
+            color: var(--text-secondary);
+        }
+
+        .filter-section {
+            padding: 20px;
+            background: var(--bg-secondary);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            margin-bottom: 15px;
+        }
+
+        .filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            background: white;
+            border: 2px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+
+        .filter-chip.active,
+        .filter-chip:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .subcategory-filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .subcategory-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .subcategory-chip {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .subcategory-chip.active,
+        .subcategory-chip:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .businesses-list {
+            padding: 0 20px 20px;
+        }
+
+        .business-card {
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .business-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .business-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .business-content {
+            padding: 20px;
+        }
+
+        .business-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .business-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .business-category {
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .business-subcategory {
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .business-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+
+        .rating-stars {
+            color: #fbbf24;
+        }
+
+        .business-details {
+            margin-top: 15px;
+        }
+
+        .business-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .business-detail:last-child {
+            margin-bottom: 0;
+        }
+
+        .business-detail i {
+            width: 16px;
+            margin-right: 12px;
+            color: var(--primary);
+        }
+
+        .business-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 15px 20px;
+            z-index: 200;
+            border-radius: 25px 25px 0 0;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 12px;
+            min-width: 60px;
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .nav-item.active i {
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 25px 25px 0 0;
+            padding: 30px 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -10px;
+            right: 0;
+            background: var(--bg-secondary);
+            border: none;
+            font-size: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--border);
+            transform: rotate(90deg);
+        }
+
+        .modal-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            margin: 0 auto 15px;
+            object-fit: cover;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .modal-category {
+            color: var(--primary);
+            font-weight: 600;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 6px 16px;
+            border-radius: 15px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .floating-add {
+            position: fixed;
+            bottom: 110px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            z-index: 150;
+        }
+
+        .floating-add:hover {
+            transform: scale(1.1) rotate(45deg);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.6);
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 500px;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div class="app-title">
+                    🐾 PAW Directory
+                </div>
+                <button class="profile-btn">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search businesses, categories..." id="searchInput">
+                <i class="fas fa-times search-clear" id="searchClear"></i>
+                <div class="search-results" id="searchResults"></div>
+            </div>
+        </header>
+
+        <!-- Home Page -->
+        <div class="page active" id="homePage">
+            <div class="welcome-section" data-aos="fade-up">
+                <div class="welcome-text">
+                    <h2>Discover Local Businesses</h2>
+                    <p>Find the best services near you</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="stat-number">250+</div>
+                        <div class="stat-label">Businesses</div>
+                    </div>
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="stat-number">4.8</div>
+                        <div class="stat-label">Avg Rating</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="categories-grid" id="categoriesGrid">
+                <!-- Categories will be populated here -->
+            </div>
+        </div>
+
+        <!-- Listings Page -->
+        <div class="page" id="listingsPage">
+            <div class="listings-header">
+                <button class="back-btn" onclick="showPage('home')">
+                    <i class="fas fa-arrow-left"></i>
+                    Back
+                </button>
+                <h2 class="listings-title" id="listingsTitle">All Businesses</h2>
+                <p class="listings-subtitle" id="listingsSubtitle">Discover amazing local services</p>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-chips" id="filterChips">
+                    <!-- Filter chips will be populated here -->
+                </div>
+                <div class="subcategory-filters" id="subcategoryFilters">
+                    <!-- Subcategory filters will be populated here -->
+                </div>
+            </div>
+
+            <div class="businesses-list" id="businessesList">
+                <!-- Businesses will be populated here -->
+            </div>
+        </div>
+
+        <!-- Favorites Page -->
+        <div class="page" id="favoritesPage">
+            <div class="listings-header">
+                <h2 class="listings-title">Your Favorites</h2>
+                <p class="listings-subtitle">Businesses you love</p>
+            </div>
+            <div class="empty-state">
+                <div class="empty-icon">💝</div>
+                <div class="empty-title">No favorites yet</div>
+                <p>Start adding businesses to your favorites!</p>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div class="page" id="profilePage">
+            <div class="listings-header">
+                <h2 class="listings-title">Your Profile</h2>
+                <p class="listings-subtitle">Manage your account</p>
+            </div>
+            <div class="empty-state">
+                <div class="empty-icon">👤</div>
+                <div class="empty-title">Profile Settings</div>
+                <p>Coming soon!</p>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-items">
+                <div class="nav-item active" onclick="showPage('home')">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="showPage('listings', 'all')">
+                    <i class="fas fa-list"></i>
+                    <span>Browse</span>
+                </div>
+                <div class="nav-item" onclick="showPage('favorites')">
+                    <i class="fas fa-heart"></i>
+                    <span>Favorites</span>
+                </div>
+                <div class="nav-item" onclick="showPage('profile')">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Floating Add Button -->
+        <button class="floating-add" onclick="alert('Add new business feature coming soon!')">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="businessModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-header">
+                <img class="modal-image" id="modalImage" alt="Business">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <div class="modal-category" id="modalCategory"></div>
+            </div>
+            <div id="modalDetails"></div>
+            <div class="modal-actions">
+                <button class="action-btn btn-primary" id="callBtn">
+                    <i class="fas fa-phone"></i> Call
+                </button>
+                <button class="action-btn btn-secondary" id="directionBtn">
+                    <i class="fas fa-map-marker-alt"></i> Directions
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    
+    <!-- <script>
+        // Enhanced categories with subcategories
+        const categories = [
+            { 
+                id: 'restaurant', 
+                name: 'Restaurant', 
+                icon: '🍴', 
+                count: 45,
+                subcategories: ['Fast Food', 'Fine Dining', 'Café', 'Italian', 'Asian', 'Mexican', 'Bakery', 'Pizza']
+            },
+            { 
+                id: 'retail', 
+                name: 'Retail', 
+                icon: '🛍️', 
+                count: 38,
+                subcategories: ['Clothing', 'Electronics', 'Books', 'Groceries', 'Pharmacy', 'Home & Garden', 'Sports', 'Jewelry']
+            },
+            { 
+                id: 'service', 
+                name: 'Service', 
+                icon: '🔧', 
+                count: 32,
+                subcategories: ['Repair', 'Plumbing', 'Electrical', 'Cleaning', 'Legal', 'Accounting', 'IT Support', 'Consulting']
+            },
+            { 
+                id: 'health', 
+                name: 'Health', 
+                icon: '⚕️', 
+                count: 28,
+                subcategories: ['Hospitals', 'Clinics', 'Dentist', 'Pharmacy', 'Physical Therapy', 'Mental Health', 'Veterinary', 'Optometry']
+            },
+            { 
+                id: 'beauty', 
+                name: 'Beauty', 
+                icon: '💄', 
+                count: 35,
+                subcategories: ['Hair Salon', 'Nail Salon', 'Wellness Spa', 'Massage', 'Skincare', 'Barbershop', 'Eyebrow', 'Tattoo']
+            },
+            { 
+                id: 'fitness', 
+                name: 'Fitness', 
+                icon: '💪', 
+                count: 22,
+                subcategories: ['Gym', 'Yoga', 'Pilates', 'Personal Training', 'Martial Arts', 'Dance', 'Swimming', 'Cycling']
+            },
+            { 
+                id: 'education', 
+                name: 'Education', 
+                icon: '📚', 
+                count: 18,
+                subcategories: ['Schools', 'Tutoring', 'Music Lessons', 'Language Classes', 'Art Classes', 'Driving School', 'Test Prep', 'Daycare']
+            },
+            { 
+                id: 'automotive', 
+                name: 'Auto', 
+                icon: '🚗', 
+                count: 25,
+                subcategories: ['Repair Shop', 'Car Wash', 'Tire Service', 'Oil Change', 'Dealership', 'Auto Parts', 'Towing', 'Detailing']
+            }
+        ];
+
+        // Enhanced business data with subcategories
+        const businesses = [
+            {
+                id: 1,
+                name: "Bella's Bistro",
+                category: "restaurant",
+                subcategory: "Italian",
+                categoryDisplay: "Italian Restaurant",
+                phone: "(555) 123-4567",
+                address: "123 Main Street, Downtown",
+                rating: 4.8,
+                reviews: 124,
+                hours: "Mon-Sat: 11AM-10PM, Sun: 12PM-9PM",
+                description: "Authentic Italian cuisine with fresh ingredients and warm atmosphere. Our chef brings traditional recipes from Tuscany with a modern twist.",
+                image: "/api/placeholder/300/160",
+                keywords: ["pasta", "pizza", "wine", "romantic", "authentic"],
+                featured: true
+            },
+            {
+                id: 2,
+                name: "TechFix Solutions",
+                category: "service",
+                subcategory: "IT Support",
+                categoryDisplay: "Tech Repair",
+                phone: "(555) 987-6543",
+                address: "456 Oak Avenue, Tech District",
+                rating: 4.9,
+                reviews: 89,
+                hours: "Mon-Fri: 9AM-6PM, Sat: 10AM-4PM",
+                description: "Professional computer and smartphone repair services with certified technicians. Same-day service available.",
+                image: "/api/placeholder/300/160",
+                keywords: ["computer", "phone", "laptop", "repair", "tech"]
+            },
+            {
+                id: 3,
+                name: "Urban Threads",
+                category: "retail",
+                subcategory: "Clothing",
+                categoryDisplay: "Fashion Boutique",
+                phone: "(555) 456-7890",
+                address: "789 Fashion Blvd, Shopping Center",
+                rating: 4.6,
+                reviews: 156,
+                hours: "Mon-Sun: 10AM-9PM",
+                description: "Trendy clothing and accessories for the modern lifestyle. Curated collection from local and international designers.",
+                image: "/api/placeholder/300/160",
+                keywords: ["fashion", "clothing", "designer", "trendy", "accessories"]
+            },
+            {
+                id: 4,
+                name: "Wellness Spa & Beauty",
+                category: "beauty",
+                subcategory: "Wellness Spa",
+                categoryDisplay: "Spa & Wellness",
+                phone: "(555) 321-0987",
+                address: "321 Zen Street, Wellness District",
+                rating: 4.7,
+                reviews: 203,
+                hours: "Tue-Sun: 9AM-8PM, Mon: Closed",
+                description: "Relaxing spa treatments and beauty services for your well-being. Organic products and experienced therapists.",
+                image: "/api/placeholder/300/160",
+                keywords: ["spa", "massage", "facial", "relaxation", "wellness"],
+                featured: true
+            },
+            {
+                id: 5,
+                name: "HealthFirst Clinic",
+                category: "health",
+                subcategory: "Clinics",
+                categoryDisplay: "Medical Center",
+                phone: "(555) 654-3210",
+                address: "654 Medical Plaza, Health Center",
+                rating: 4.9,
+                reviews: 67,
+                hours: "Mon-Fri: 8AM-6PM, Sat: 9AM-2PM",
+                description: "Comprehensive healthcare services with experienced medical professionals and modern facilities. Walk-ins welcome.",
+                image: "/api/placeholder/300/160",
+                keywords: ["doctor", "medical", "healthcare", "clinic", "checkup"]
+            },
+            {
+                id: 6,
+                name: "PowerFit Gym",
+                category: "fitness",
+                subcategory: "Gym",
+                categoryDisplay: "Fitness Center",
+                phone: "(555) 789-0123",
+                address: "987 Fitness Road, Sports Complex",
+                rating: 4.5,
+                reviews: 312,
+                hours: "Mon-Sun: 5AM-11PM",
+                description: "State-of-the-art fitness equipment and personal training services. Group classes and 24/7 access available.",
+                image: "/api/placeholder/300/160",
+                keywords: ["gym", "fitness", "workout", "training", "exercise"]
+            },
+            {
+                id: 7,
+                name: "Corner Café",
+                category: "restaurant",
+                subcategory: "Café",
+                categoryDisplay: "Coffee Shop",
+                phone: "(555) 234-5678",
+                address: "234 Coffee Lane, Arts Quarter",
+                rating: 4.4,
+                reviews: 198,
+                hours: "Mon-Sun: 6AM-8PM",
+                description: "Artisanal coffee and fresh pastries in a cozy atmosphere. Free WiFi and study-friendly environment.",
+                image: "/api/placeholder/300/160",
+                keywords: ["coffee", "café", "pastries", "wifi", "study"]
+            },
+            {
+                id: 8,
+                name: "Home & Garden Plus",
+                category: "retail",
+                subcategory: "Home & Garden",
+                categoryDisplay: "Home Improvement",
+                phone: "(555) 876-5432",
+                address: "876 Green Thumb Ave, Garden Center",
+                rating: 4.3,
+                reviews: 145,
+                hours: "Mon-Sat: 8AM-7PM, Sun: 9AM-5PM",
+                description: "Everything you need for your home and garden projects. Expert advice and quality tools.",
+                image: "/api/placeholder/300/160",
+                keywords: ["home", "garden", "tools", "plants", "improvement"]
+            },
+            {
+                id: 9,
+                name: "QuickBites Express",
+                category: "restaurant",
+                subcategory: "Fast Food",
+                categoryDisplay: "Fast Food",
+                phone: "(555) 111-2222",
+                address: "111 Speed Street, Fast Lane",
+                rating: 4.2,
+                reviews: 89,
+                hours: "Mon-Sun: 10AM-11PM",
+                description: "Quick and delicious meals for busy lifestyles. Fresh ingredients and fast service.",
+                image: "/api/placeholder/300/160",
+                keywords: ["fast", "quick", "burger", "fries", "takeout"]
+            },
+            {
+                id: 10,
+                name: "ElectroWorld",
+                category: "retail",
+                subcategory: "Electronics",
+                categoryDisplay: "Electronics Store",
+                phone: "(555) 333-4444",
+                address: "333 Tech Avenue, Digital District",
+                rating: 4.6,
+                reviews: 234,
+                hours: "Mon-Sat: 9AM-8PM, Sun: 11AM-6PM",
+                description: "Latest electronics and gadgets with competitive prices. Expert staff and warranty support.",
+                image: "/api/placeholder/300/160",
+                keywords: ["electronics", "gadgets", "phone", "computer", "tech"]
+            }
+        ];
+
+        // App state
+        let currentPage = 'home';
+        let currentCategory = 'all';
+        let currentSubcategory = 'all';
+        let filteredBusinesses = [...businesses];
+        let searchTimeout;
+
+        // DOM elements
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const searchResults = document.getElementById('searchResults');
+
+        // Initialize app
+        function init() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+            
+            renderCategories();
+            setupEventListeners();
+            showPage('home');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            searchInput.addEventListener('input', handleSearchInput);
+            searchInput.addEventListener('focus', handleSearchFocus);
+            searchInput.addEventListener('blur', handleSearchBlur);
+            searchClear.addEventListener('click', clearSearch);
+            
+            // Close search results when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container')) {
+                    hideSearchResults();
+                }
+            });
+            
+            // Close modal when clicking outside
+            document.getElementById('businessModal').addEventListener('click', (e) => {
+                if (e.target.id === 'businessModal') closeModal();
+            });
+        }
+
+        // Handle search input
+        function handleSearchInput() {
+            const query = searchInput.value.trim();
+            
+            // Show/hide clear button
+            searchClear.style.display = query ? 'flex' : 'none';
+            
+            // Clear previous timeout
+            if (searchTimeout) clearTimeout(searchTimeout);
+            
+            // Debounce search
+            searchTimeout = setTimeout(() => {
+                if (query.length > 0) {
+                    performSearch(query);
+                } else {
+                    hideSearchResults();
+                }
+                
+                // Update listings if on listings page
+                if (currentPage === 'listings') {
+                    renderListings();
+                }
+            }, 300);
+        }
+
+        // Handle search focus
+        function handleSearchFocus() {
+            const query = searchInput.value.trim();
+            if (query.length > 0) {
+                performSearch(query);
+            }
+        }
+
+        // Handle search blur
+        function handleSearchBlur() {
+            // Delay hiding to allow click on search results
+            setTimeout(() => {
+                hideSearchResults();
+            }, 200);
+        }
+
+        // Perform search
+        function performSearch(query) {
+            const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+            const results = [];
+            
+            // Search in categories
+            categories.forEach(category => {
+                if (category.name.toLowerCase().includes(query.toLowerCase())) {
+                    results.push({
+                        type: 'category',
+                        id: category.id,
+                        title: category.name,
+                        subtitle: `${category.count} businesses`,
+                        icon: category.icon,
+                        matchText: highlightMatch(category.name, query)
+                    });
+                }
+                
+                // Search in subcategories
+                category.subcategories.forEach(subcategory => {
+                    if (subcategory.toLowerCase().includes(query.toLowerCase())) {
+                        results.push({
+                            type: 'subcategory',
+                            id: subcategory,
+                            categoryId: category.id,
+                            title: subcategory,
+                            subtitle: `in ${category.name}`,
+                            icon: category.icon,
+                            matchText: highlightMatch(subcategory, query)
+                        });
+                    }
+                });
+            });
+            
+            // Search in businesses
+            businesses.forEach(business => {
+                let matchScore = 0;
+                let matchedFields = [];
+                
+                // Check name
+                if (business.name.toLowerCase().includes(query.toLowerCase())) {
+                    matchScore += 3;
+                    matchedFields.push('name');
+                }
+                
+                // Check category and subcategory
+                if (business.categoryDisplay.toLowerCase().includes(query.toLowerCase()) ||
+                    business.subcategory.toLowerCase().includes(query.toLowerCase())) {
+                    matchScore += 2;
+                    matchedFields.push('category');
+                }
+                
+                // Check keywords
+                const hasKeywordMatch = business.keywords.some(keyword => 
+                    keyword.toLowerCase().includes(query.toLowerCase())
+                );
+                if (hasKeywordMatch) {
+                    matchScore += 2;
+                    matchedFields.push('keywords');
+                }
+                
+                // Check address
+                if (business.address.toLowerCase().includes(query.toLowerCase())) {
+                    matchScore += 1;
+                    matchedFields.push('address');
+                }
+                
+                // Check description
+                if (business.description.toLowerCase().includes(query.toLowerCase())) {
+                    matchScore += 1;
+                    matchedFields.push('description');
+                }
+                
+                if (matchScore > 0) {
+                    results.push({
+                        type: 'business',
+                        id: business.id,
+                        title: business.name,
+                        subtitle: `${business.categoryDisplay} • ${business.rating}⭐`,
+                        icon: '🏢',
+                        matchText: highlightMatch(business.name, query),
+                        matchScore,
+                        business
+                    });
+                }
+            });
+            
+            // Sort results by relevance
+            results.sort((a, b) => {
+                if (a.type === 'business' && b.type === 'business') {
+                    return b.matchScore - a.matchScore;
+                }
+                if (a.type === 'category') return -1;
+                if (b.type === 'category') return 1;
+                return 0;
+            });
+            
+            displaySearchResults(results.slice(0, 8)); // Limit to 8 results
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            if (results.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="search-result-item">
+                        <div class="search-result-icon">🔍</div>
+                        <div class="search-result-info">
+                            <div class="search-result-meta">No results found</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                searchResults.innerHTML = results.map(result => `
+                    <div class="search-result-item" onclick="handleSearchResultClick('${result.type}', '${result.id}', '${result.categoryId || ''}')">
+                        <div class="search-result-icon">${result.icon}</div>
+                        <div class="search-result-info">
+                            <h4>${result.matchText || result.title}</h4>
+                            <div class="search-result-meta">${result.subtitle}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            searchResults.style.display = 'block';
+        }
+
+        // Handle search result click
+        function handleSearchResultClick(type, id, categoryId) {
+            hideSearchResults();
+            
+            if (type === 'category') {
+                showPage('listings', id);
+            } else if (type === 'subcategory') {
+                showPage('listings', categoryId);
+                setTimeout(() => {
+                    filterBySubcategory(id);
+                }, 100);
+            } else if (type === 'business') {
+                const business = businesses.find(b => b.id == id);
+                if (business) {
+                    showPage('listings', business.category);
+                    setTimeout(() => {
+                        openModal(parseInt(id));
+                    }, 300);
+                }
+            }
+        }
+
+        // Highlight search matches
+        function highlightMatch(text, query) {
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight">$1</span>');
+        }
+
+        // Hide search results
+        function hideSearchResults() {
+            searchResults.style.display = 'none';
+        }
+
+        // Clear search
+        function clearSearch() {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            hideSearchResults();
+            
+            if (currentPage === 'listings') {
+                renderListings();
+            }
+        }
+
+        // Show page
+        function showPage(page, category = null) {
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(page + 'Page').classList.add('active');
+            
+            // Update active nav item
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageIndex = ['home', 'listings', 'favorites', 'profile'].indexOf(page);
+            if (pageIndex >= 0) {
+                navItems[pageIndex].classList.add('active');
+            }
+            
+            currentPage = page;
+            
+            if (page === 'listings') {
+                currentCategory = category || 'all';
+                currentSubcategory = 'all';
+                renderListings();
+            } else if (page === 'home') {
+                clearSearch();
+            }
+        }
+
+        // Render categories
+        function renderCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = categories.map((cat, index) => `
+                <div class="category-card" onclick="showPage('listings', '${cat.id}')" 
+                     data-aos="fade-up" data-aos-delay="${index * 100}">
+                    <span class="category-icon">${cat.icon}</span>
+                    <div class="category-name">${cat.name}</div>
+                    <div class="category-count">${cat.count} businesses</div>
+                    <div class="subcategories">${cat.subcategories.slice(0, 3).join(' • ')}</div>
+                </div>
+            `).join('');
+        }
+
+        // Render listings
+        function renderListings() {
+            const title = document.getElementById('listingsTitle');
+            const subtitle = document.getElementById('listingsSubtitle');
+            const filterChips = document.getElementById('filterChips');
+            const subcategoryFilters = document.getElementById('subcategoryFilters');
+            const businessesList = document.getElementById('businessesList');
+            
+            // Update title
+            if (currentCategory === 'all') {
+                title.textContent = 'All Businesses';
+                subtitle.textContent = 'Discover amazing local services';
+            } else {
+                const cat = categories.find(c => c.id === currentCategory);
+                title.textContent = cat ? cat.name : 'Businesses';
+                subtitle.textContent = `${cat ? cat.count : 0} businesses found`;
+            }
+            
+            // Render filter chips
+            filterChips.innerHTML = `
+                <div class="filter-chip ${currentCategory === 'all' ? 'active' : ''}" 
+                     onclick="filterByCategory('all')">All</div>
+                ${categories.map(cat => `
+                    <div class="filter-chip ${currentCategory === cat.id ? 'active' : ''}" 
+                         onclick="filterByCategory('${cat.id}')">${cat.icon} ${cat.name}</div>
+                `).join('')}
+            `;
+            
+            // Render subcategory filters
+            if (currentCategory !== 'all') {
+                const cat = categories.find(c => c.id === currentCategory);
+                if (cat) {
+                    subcategoryFilters.innerHTML = `
+                        <div class="subcategory-chip ${currentSubcategory === 'all' ? 'active' : ''}" 
+                             onclick="filterBySubcategory('all')">All ${cat.name}</div>
+                        ${cat.subcategories.map(sub => `
+                            <div class="subcategory-chip ${currentSubcategory === sub ? 'active' : ''}" 
+                                 onclick="filterBySubcategory('${sub}')">${sub}</div>
+                        `).join('')}
+                    `;
+                    subcategoryFilters.style.display = 'flex';
+                } else {
+                    subcategoryFilters.style.display = 'none';
+                }
+            } else {
+                subcategoryFilters.style.display = 'none';
+            }
+            
+            // Filter and render businesses
+            const query = searchInput.value.toLowerCase().trim();
+            
+            filteredBusinesses = businesses.filter(business => {
+                const matchesCategory = currentCategory === 'all' || business.category === currentCategory;
+                const matchesSubcategory = currentSubcategory === 'all' || business.subcategory === currentSubcategory;
+                
+                let matchesSearch = true;
+                if (query) {
+                    matchesSearch = business.name.toLowerCase().includes(query) || 
+                        business.categoryDisplay.toLowerCase().includes(query) ||
+                        business.subcategory.toLowerCase().includes(query) ||
+                        business.address.toLowerCase().includes(query) ||
+                        business.keywords.some(keyword => keyword.toLowerCase().includes(query)) ||
+                        business.description.toLowerCase().includes(query);
+                }
+                
+                return matchesCategory && matchesSubcategory && matchesSearch;
+            });
+            
+            if (filteredBusinesses.length === 0) {
+                businessesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">No businesses found</div>
+                        <p>Try adjusting your search or filter</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            businessesList.innerHTML = filteredBusinesses.map((business, index) => `
+                <div class="business-card" onclick="openModal(${business.id})" 
+                     data-aos="fade-up" data-aos-delay="${index * 100}">
+                    <img src="${business.image}" alt="${business.name}" class="business-image">
+                    <div class="business-content">
+                        <div class="business-header">
+                            <div class="business-info">
+                                <h3>${business.name}</h3>
+                                <div class="business-category">${business.categoryDisplay}</div>
+                                <div class="business-subcategory">${business.subcategory}</div>
+                            </div>
+                            <div class="business-rating">
+                                <span class="rating-stars">⭐</span>
+                                <span>${business.rating}</span>
+                            </div>
+                        </div>
+                        <div class="business-details">
+                            <div class="business-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${business.address}
+                            </div>
+                            <div class="business-detail">
+                                <i class="fas fa-phone"></i>
+                                ${business.phone}
+                            </div>
+                            <div class="business-detail">
+                                <i class="fas fa-star"></i>
+                                ${business.rating} (${business.reviews} reviews)
+                            </div>
+                        </div>
+                        <div class="business-actions">
+                            <button class="action-btn btn-primary" onclick="event.stopPropagation(); window.location.href='tel:${business.phone}'">
+                                <i class="fas fa-phone"></i> Call
+                            </button>
+                            <button class="action-btn btn-secondary" onclick="event.stopPropagation(); openDirections('${encodeURIComponent(business.address)}')">
+                                <i class="fas fa-map-marker-alt"></i> Directions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Re-initialize AOS for new elements
+            setTimeout(() => AOS.refresh(), 100);
+        }
+
+        // Filter by category
+        function filterByCategory(category) {
+            currentCategory = category;
+            currentSubcategory = 'all';
+            renderListings();
+        }
+
+        // Filter by subcategory
+        function filterBySubcategory(subcategory) {
+            currentSubcategory = subcategory;
+            renderListings();
+        }
+
+        // Open modal
+        function openModal(businessId) {
+            const business = businesses.find(b => b.id === businessId);
+            if (!business) return;
+
+            document.getElementById('modalImage').src = business.image;
+            document.getElementById('modalTitle').textContent = business.name;
+            document.getElementById('modalCategory').textContent = business.categoryDisplay;
+            
+            document.getElementById('modalDetails').innerHTML = `
+                <div class="business-detail">
+                    <i class="fas fa-tag"></i>
+                    ${business.subcategory}
+                </div>
+                <div class="business-detail">
+                    <i class="fas fa-map-marker-alt"></i>
+                    ${business.address}
+                </div>
+                <div class="business-detail">
+                    <i class="fas fa-phone"></i>
+                    ${business.phone}
+                </div>
+                <div class="business-detail">
+                    <div class="business-rating">
+                        <i class="fas fa-star"></i>
+                        <span>${business.rating} (${business.reviews} reviews)</span>
+                    </div>
+                </div>
+                <div class="business-detail">
+                    <i class="fas fa-clock"></i>
+                    ${business.hours}
+                </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                    <p style="color: var(--text-secondary); line-height: 1.6;">${business.description}</p>
+                </div>
+                <div style="margin-top: 15px;">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Keywords:</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${business.keywords.map(keyword => `
+                            <span style="background: var(--bg-secondary); color: var(--text-secondary); 
+                                        padding: 4px 8px; border-radius: 8px; font-size: 12px;">${keyword}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Setup action buttons
+            document.getElementById('callBtn').onclick = () => {
+                window.location.href = `tel:${business.phone}`;
+            };
+            
+            document.getElementById('directionBtn').onclick = () => {
+                openDirections(business.address);
+            };
+
+            document.getElementById('businessModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('businessModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Open directions
+        function openDirections(address) {
+            const encodedAddress = encodeURIComponent(address);
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', init);
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZnVuY3Rpb24oZXZlbnQpIHt9KTs=');
+        }
+    </script> -->
+
+    // ...existing code...
+
+    <script>
+        // Update API Base URL to use the relative path since we're serving from the same NestJS server
+        const API_BASE_URL = '/api';
+        
+        // App state
+        let currentPage = 'home';
+        let currentCategory = 'all';
+        let currentSubcategory = 'all';
+        let categories = [];
+        let businesses = [];
+        let filteredBusinesses = [];
+        let searchTimeout;
+    
+        // DOM elements
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const searchResults = document.getElementById('searchResults');
+
+        const DEBUG = true; // Set ke false untuk production
+
+// Fungsi debug log
+function debugLog(...args) {
+    if (DEBUG) {
+        console.log('[DEBUG]', ...args);
+    }
+}
+
+// Update variabel global
+let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
+
+    // ...existing code...
+
+    // Initialize app
+    async function init() {
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        // Show loading state
+        showLoading();
+        
+        try {
+            // Setup event listeners first to enable user interaction
+            setupEventListeners();
+            
+            // Check if user is logged in
+            if (isLoggedIn()) {
+                updateUserInterface(true);
+            } else {
+                updateUserInterface(false);
+            }
+            
+            // Fetch categories from API
+            await fetchCategories();
+            debugLog('Categories after fetch:', categories);
+            
+            if (!categories || categories.length === 0) {
+                showError('No categories available. Please try again later.');
+                return;
+            }
+            
+            // Fetch initial businesses only after categories are loaded
+            await fetchBusinesses();
+            
+            // Fetch stats if available
+            try {
+                await fetchStats();
+            } catch (statsError) {
+                console.warn('Stats could not be loaded, using defaults', statsError);
+                updateHomeStats({
+                    businessCount: businesses.length,
+                    categoryCount: categories.length,
+                    averageRating: 4.5
+                });
+            }
+            
+            // Render categories
+            renderCategories();
+            
+            // Show home page
+            showPage('home');
+        } catch (error) {
+            console.error('Error initializing app:', error);
+            showError('Failed to load data. Please try again later.');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+        searchInput.addEventListener('input', handleSearchInput);
+        searchInput.addEventListener('focus', handleSearchFocus);
+        searchInput.addEventListener('blur', handleSearchBlur);
+        searchClear.addEventListener('click', clearSearch);
+        
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                hideSearchResults();
+            }
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('businessModal').addEventListener('click', (e) => {
+            if (e.target.id === 'businessModal') closeModal();
+        });
+        
+        // Handle error toast clicks
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.error-toast')) {
+                e.target.closest('.error-toast').remove();
+            }
+        });
+        
+        // Listen for network status changes
+        window.addEventListener('online', () => {
+            console.log('Back online, refreshing data...');
+            if (currentPage === 'home') {
+                init();
+            } else if (currentPage === 'listings') {
+                renderListings();
+            }
+        });
+    }
+
+    // ...existing code...
+        // Check if user is logged in    
+        // Show loading state
+        function showLoading() {
+            document.getElementById('categoriesGrid').innerHTML = `
+                <div style="text-align: center; padding: 40px; grid-column: span 2;">
+                    <div class="loading"></div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Loading...</p>
+                </div>
+            `;
+        }
+        
+        // Hide loading state
+        function hideLoading() {
+            // Loading state will be replaced by content
+        }
+        
+        // Show error message
+        function showError(message) {
+            document.getElementById('categoriesGrid').innerHTML = `
+                <div style="text-align: center; padding: 40px; grid-column: span 2;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+                    <p style="margin-bottom: 20px; color: var(--text-primary); font-weight: 600;">${message}</p>
+                    <button class="action-btn btn-primary" style="display: inline-block;" onclick="init()">
+                        <i class="fas fa-redo"></i> Retry
+                    </button>
+                </div>
+            `;
+        }
+    
+        // Handle API errors
+        function handleApiError(error, defaultReturnValue = []) {
+            console.error('API Error:', error.message || 'Unknown error');
+            
+            // Untuk user interface, tampilkan toast atau notifikasi error
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'error-toast';
+            errorMessage.innerHTML = `
+                <div class="error-toast-content">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Error: ${error.message || 'Failed to connect to server'}</span>
+                </div>
+            `;
+            document.body.appendChild(errorMessage);
+            
+            // Hilangkan setelah 3 detik
+            setTimeout(() => {
+                errorMessage.classList.add('hide');
+                setTimeout(() => errorMessage.remove(), 300);
+            }, 3000);
+            
+            return defaultReturnValue;
+        }
+
+        // Fetch categories from API
+    //     async function fetchCategories() {
+    //     try {
+    //         debugLog('Fetching categories...');
+    //         const response = await fetch(`${API_BASE_URL}/categories`);
+    //         if (!response.ok) {
+    //             throw new Error(`Failed to fetch categories: ${response.status} ${response.statusText}`);
+    //         }
+            
+    //         let data = await response.json();
+    //         debugLog('Categories fetched:', data);
+            
+    //         // Filter out invalid categories (seperti kategori dengan name "string")
+    //         data = data.filter(cat => cat.name !== "string" && cat.name.trim() !== "");
+            
+    //         // Tambahkan property count jika tidak ada
+    //         data = data.map(category => ({
+    //             ...category,
+    //             count: category.count || 0
+    //         }));
+            
+    //         categories = data;
+    //         return categories;
+    //     } catch (error) {
+    //         console.error('Error fetching categories:', error);
+    //         throw error; // Re-throw to let init() handle it
+    //     }
+    // }
+    async function fetchCategories() {
+    try {
+        debugLog('Fetching categories...');
+        const response = await fetch(`${API_BASE_URL}/categories`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch categories: ${response.status} ${response.statusText}`);
+        }
+        
+        let data = await response.json();
+        debugLog('Raw categories data:', data);
+        
+        // Jika data adalah array, gunakan langsung
+        // Jika data memiliki property 'data' yang berisi array, gunakan itu
+        if (data.data && Array.isArray(data.data)) {
+            data = data.data;
+        } else if (!Array.isArray(data)) {
+            debugLog('Invalid categories format:', data);
+            return [];
+        }
+        
+        // Filter kategori yang tidak valid dan proses data
+        data = data.filter(cat => cat && cat.name && cat.name !== "string" && cat.name.trim() !== "").map(cat => {
+            // Pastikan subcategories ada dan dalam format yang diharapkan
+            let subcategories = [];
+            
+            if (cat.subcategories) {
+                // Jika subcategories adalah string JSON, parse
+                if (typeof cat.subcategories === 'string') {
+                    try {
+                        subcategories = JSON.parse(cat.subcategories);
+                    } catch (e) {
+                        debugLog('Error parsing subcategories string:', e);
+                        subcategories = [];
+                    }
+                } 
+                 // Jika subcategories sudah array, gunakan
+                 else if (Array.isArray(cat.subcategories)) {
+                    subcategories = cat.subcategories;
+                }
+            }
+            
+            // Konversi subcategories ke format yang konsisten
+            subcategories = subcategories.map(sub => {
+                if (typeof sub === 'string') {
+                    return { id: sub, name: sub };
+                } else if (typeof sub === 'object' && sub !== null) {
+                    return { 
+                        id: sub.id || sub._id || '', 
+                        name: sub.name || 'Subcategory' 
+                    };
+                }
+                return { id: '', name: 'Subcategory' };
+            });
+            
+            return {
+                id: cat.id || cat._id,
+                name: cat.name,
+                icon: cat.icon || '📁',
+                count: cat.count || 0,
+                subcategories: subcategories
+            };
+        });
+        
+        debugLog('Processed categories:', data);
+        categories = data;
+        return categories;
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        throw error; // Re-throw to let init() handle it
+    }
+}
+
+
+    
+        // Fetch businesses from API (untuk all businesses)
+        async function fetchBusinesses() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/businesses?limit=10&offset=0&sortBy=createdAt&sortOrder=DESC`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch businesses: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Ensure we have an array - API might return {data: [...]}
+                if (!data) {
+                    console.warn('Received empty data for businesses');
+                    businesses = [];
+                    filteredBusinesses = [];
+                    return [];
+                }
+                
+                // Handle API response structure
+                const businessArray = data.data && Array.isArray(data.data) ? data.data : 
+                                    (Array.isArray(data) ? data : []);
+                
+                businesses = businessArray;
+                filteredBusinesses = [...businesses];
+                return businesses;
+            } catch (error) {
+                console.error('Error fetching businesses:', error);
+                // Don't throw here, just return empty array
+                businesses = [];
+                filteredBusinesses = [];
+                return [];
+            }
+        }
+        
+        // Fetch businesses by category
+        async function fetchBusinessesByCategory(categoryId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/businesses?category=${categoryId}&limit=10&offset=0&sortBy=createdAt&sortOrder=DESC`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch businesses by category: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Check if data is in expected format (might be wrapped in a data property)
+                const businessesData = data.data ? data.data : data;
+                
+                filteredBusinesses = businessesData;
+                return businessesData;
+            } catch (error) {
+                return handleApiError(error, []);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Fetch user favorites
+        async function fetchUserFavorites() {
+            if (!isLoggedIn()) {
+                showPage('profile');
+                return;
+            }
+            
+            try {
+                showPage('favorites');
+                document.getElementById('favoritesPage').innerHTML = `
+                    <div class="listings-header">
+                        <h2 class="listings-title">Your Favorites</h2>
+                        <p class="listings-subtitle">Businesses you love</p>
+                    </div>
+                    <div style="text-align: center; padding: 40px;">
+                        <div class="loading"></div>
+                        <p style="margin-top: 10px; color: var(--text-secondary);">Loading your favorites...</p>
+                    </div>
+                `;
+                
+                const response = await fetch(`${API_BASE_URL}/user/favorites`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch favorites');
+                }
+                
+                const favorites = await response.json();
+                
+                if (favorites.length === 0) {
+                    document.getElementById('favoritesPage').innerHTML = `
+                        <div class="listings-header">
+                            <h2 class="listings-title">Your Favorites</h2>
+                            <p class="listings-subtitle">Businesses you love</p>
+                        </div>
+                        <div class="empty-state">
+                            <div class="empty-icon">💝</div>
+                            <div class="empty-title">No favorites yet</div>
+                            <p>Start adding businesses to your favorites!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                document.getElementById('favoritesPage').innerHTML = `
+                    <div class="listings-header">
+                        <h2 class="listings-title">Your Favorites</h2>
+                        <p class="listings-subtitle">${favorites.length} saved businesses</p>
+                    </div>
+                    <div class="businesses-list" id="favoritesList"></div>
+                `;
+                
+                // Render favorites
+                const favoritesList = document.getElementById('favoritesList');
+                favoritesList.innerHTML = favorites.map((business, index) => {
+                    const imageUrl = business.images && business.images.length > 0 
+                        ? business.images[0] 
+                        : '/api/placeholder/300/160';
+                        
+                    return `
+                        <div class="business-card" onclick="openModal('${business.id}')" 
+                            data-aos="fade-up" data-aos-delay="${index * 100}">
+                            <img src="${imageUrl}" alt="${business.name}" class="business-image">
+                            <div class="business-content">
+                                <div class="business-header">
+                                    <div class="business-info">
+                                        <h3>${business.name}</h3>
+                                        <div class="business-category">${business.categoryDisplay || 'Business'}</div>
+                                    </div>
+                                    <div class="business-rating">
+                                        <span class="rating-stars">⭐</span>
+                                        <span>${business.rating || '0.0'}</span>
+                                    </div>
+                                </div>
+                                <div class="business-details">
+                                    <div class="business-detail">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        ${business.address || 'Address not available'}
+                                    </div>
+                                    <div class="business-detail">
+                                        <i class="fas fa-phone"></i>
+                                        ${business.phone || 'Phone not available'}
+                                    </div>
+                                </div>
+                                <div class="business-actions">
+                                    <button class="action-btn btn-primary" onclick="event.stopPropagation(); window.location.href='tel:${business.phone}'">
+                                        <i class="fas fa-phone"></i> Call
+                                    </button>
+                                    <button class="action-btn btn-danger" onclick="event.stopPropagation(); removeFavorite('${business.id}')">
+                                        <i class="fas fa-heart-broken"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Re-initialize AOS for new elements
+                setTimeout(() => AOS.refresh(), 100);
+            } catch (error) {
+                console.error('Error fetching favorites:', error);
+                document.getElementById('favoritesPage').innerHTML = `
+                    <div class="listings-header">
+                        <h2 class="listings-title">Your Favorites</h2>
+                        <p class="listings-subtitle">Businesses you love</p>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <div class="empty-title">Error loading favorites</div>
+                        <p>Please try again later</p>
+                        <button class="action-btn btn-primary" style="margin-top: 15px;" onclick="fetchUserFavorites()">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // User login
+        async function loginUser(email, password) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Login failed');
+                }
+                
+                const userData = await response.json();
+                
+                // Store user data and token
+                localStorage.setItem('user', JSON.stringify(userData.user));
+                localStorage.setItem('token', userData.token);
+                
+                // Update UI for logged-in state
+                updateUserInterface(true);
+                
+                return userData;
+            } catch (error) {
+                console.error('Login error:', error);
+                throw error;
+            }
+        }
+
+        // Check if user is logged in
+        function isLoggedIn() {
+            return !!localStorage.getItem('token');
+        }
+
+        // Update UI based on login state
+        function updateUserInterface(isLoggedIn) {
+            const profileBtn = document.querySelector('.profile-btn');
+            
+            if (isLoggedIn) {
+                // Update UI for logged-in state
+                profileBtn.innerHTML = '<i class="fas fa-user-check"></i>';
+                
+                // Update profile page
+                document.getElementById('profilePage').innerHTML = `
+                    <div class="listings-header">
+                        <h2 class="listings-title">Your Profile</h2>
+                        <p class="listings-subtitle">Manage your account</p>
+                    </div>
+                    <div style="padding: 20px;">
+                        <button class="action-btn btn-primary" style="width: 100%; margin-bottom: 20px;" onclick="fetchUserFavorites()">
+                            <i class="fas fa-heart"></i> My Favorites
+                        </button>
+                        <button class="action-btn btn-secondary" style="width: 100%;" onclick="logoutUser()">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                `;
+            } else {
+                // Update UI for logged-out state
+                profileBtn.innerHTML = '<i class="fas fa-user"></i>';
+                
+                // Update profile page to show login form
+                document.getElementById('profilePage').innerHTML = `
+                    <div class="listings-header">
+                        <h2 class="listings-title">Your Profile</h2>
+                        <p class="listings-subtitle">Login to your account</p>
+                    </div>
+                    <div style="padding: 20px;">
+                        <form id="loginForm" onsubmit="handleLogin(event)">
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Email</label>
+                                <input type="email" id="loginEmail" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Password</label>
+                                <input type="password" id="loginPassword" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                            </div>
+                            <button type="submit" class="action-btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </button>
+                            <p style="text-align: center; margin-top: 15px; color: var(--text-secondary);">
+                                Don't have an account? <a href="#" onclick="showRegisterForm()" style="color: var(--primary);">Register</a>
+                            </p>
+                        </form>
+                        <div id="loginError" style="color: var(--danger); margin-top: 15px; text-align: center; display: none;"></div>
+                    </div>
+                `;
+            }
+        }
+
+        // Fetch statistics for home page
+        async function fetchStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/stats`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch stats: ${response.status} ${response.statusText}`);
+                }
+                
+                const stats = await response.json();
+                updateHomeStats(stats);
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+                // Use default stats if API fails
+                updateHomeStats({
+                    businessCount: businesses.length,
+                    categoryCount: categories.length,
+                    averageRating: 4.5
+                });
+            }
+        }
+
+        // Update home page statistics
+        function updateHomeStats(stats) {
+            const statsGrid = document.querySelector('.stats-grid');
+            if (!statsGrid) return;
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-number">${stats.businessCount || 0}+</div>
+                    <div class="stat-label">Businesses</div>
+                </div>
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-number">${stats.categoryCount || 0}</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+                <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-number">${stats.averageRating?.toFixed(1) || '0.0'}</div>
+                    <div class="stat-label">Avg Rating</div>
+                </div>
+            `;
+        }
+                
+        // Fetch businesses by subcategory
+        async function fetchBusinessesBySubcategory(categoryId, subcategoryId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/businesses?category=${categoryId}&subcategory=${subcategoryId}&limit=10&offset=0&sortBy=createdAt&sortOrder=DESC`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch businesses by subcategory: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Check if data is in expected format
+                const businessesData = data.data ? data.data : data;
+                
+                filteredBusinesses = businessesData;
+                return businessesData;
+            } catch (error) {
+                return handleApiError(error, []);
+            }
+        }
+        
+        // Fetch business detail
+        async function fetchBusinessDetail(businessId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/businesses/${businessId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch business detail: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                return handleApiError(error, {});
+            }
+        }
+        
+        // Search businesses - juga ubah format parameter untuk konsistensi
+        async function searchBusinesses(query, options = {}) {
+    try {
+        // Default options
+        const defaults = {
+            limit: 10,
+            offset: 0,
+            sortBy: 'relevance', // 'relevance', 'name', 'rating', 'createdAt'
+            category: null,
+            subcategory: null
+        };
+        
+        // Gabungkan options dengan defaults
+        const settings = { ...defaults, ...options };
+        
+        // Build query string
+        let queryParams = `q=${encodeURIComponent(query)}`;
+        queryParams += `&limit=${settings.limit}`;
+        queryParams += `&offset=${settings.offset}`;
+        queryParams += `&sortBy=${settings.sortBy}`;
+        
+        if (settings.category) {
+            queryParams += `&category=${settings.category}`;
+        }
+        
+        if (settings.subcategory) {
+            queryParams += `&subcategory=${settings.subcategory}`;
+        }
+        
+        debugLog('Search query params:', queryParams);
+        
+            
+            // Fetch results
+            // Fetch results
+        const response = await fetch(`${API_BASE_URL}/search?${queryParams}`);
+        
+        if (!response.ok) {
+            throw new Error(`Search failed: ${response.status} ${response.statusText}`);
+        }
+        
+        const results = await response.json();
+        debugLog('Search results:', results);
+        
+        return results;
+    } catch (error) {
+        console.error('Search error:', error);
+        return { data: [], categories: [], total: 0, page: 1, limit: 10, query };
+    }
+}
+
+
+
+// Render search results page
+function renderSearchResultsPage(searchResults, query) {
+    // Check if we're in the listings page
+    if (currentPage !== 'listings') {
+        showPage('listings', 'all');
+    }
+    
+    const listingsContainer = document.getElementById('listingsContainer');
+    
+    // Set page title and subtitle
+    document.getElementById('listingsTitle').textContent = `Search Results: "${query}"`;
+    document.getElementById('listingsSubtitle').textContent = 
+        `Found ${searchResults.total} result${searchResults.total !== 1 ? 's' : ''}`;
+    
+    // Jika ada kategori yang cocok, tampilkan di bagian atas
+    if (searchResults.categories && searchResults.categories.length > 0) {
+        const categoriesSection = document.createElement('div');
+        categoriesSection.className = 'search-categories-section';
+        categoriesSection.innerHTML = `
+            <h3 class="section-title">Matching Categories</h3>
+            <div class="category-cards">
+                ${searchResults.categories.map(category => `
+                    <div class="category-card compact" onclick="showPage('listings', '${category.id}')">
+                        <span class="category-icon">${category.icon || '📁'}</span>
+                        <div class="category-name">${category.name}</div>
+                        <div class="category-count">${category.count || 0} businesses</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        // Tambahkan section kategori sebelum daftar bisnis
+        const businessesList = document.getElementById('businessesList');
+        if (businessesList) {
+            listingsContainer.insertBefore(categoriesSection, businessesList.parentNode);
+        }
+    }
+     // Update filteredBusinesses dan render bisnis
+     filteredBusinesses = searchResults.data;
+    renderBusinessesList();
+    
+    // Scroll ke atas halaman
+    window.scrollTo(0, 0);
+}
+
+
+
+
+        async function getSearchSuggestions(query) {
+            if (!query || query.length < 3) return [];
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/search/suggestions?q=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to get suggestions: ${response.status} ${response.statusText}`);
+                }
+                
+                const suggestions = await response.json();
+                return suggestions;
+            } catch (error) {
+                console.error('Suggestion error:', error);
+                return [];
+            }
+        }
+
+        // Fetch business detail
+        async function fetchBusinessDetail(businessId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/businesses/${businessId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch business detail: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                return handleApiError(error, {});
+            }
+        }
+    
+        // Handle search input
+        function handleSearchInput() {
+        const query = searchInput.value.trim();
+            
+        // Show/hide clear button
+        searchClear.style.display = query ? 'flex' : 'none';
+        
+        // Clear previous timeout
+        if (searchTimeout) clearTimeout(searchTimeout);
+        
+        // Debounce search
+        searchTimeout = setTimeout(async () => {
+            if (query.length > 2) {
+                try {
+                    // Tampilkan loading di search results
+                    searchResults.innerHTML = `
+                        <div class="search-result-item">
+                            <div class="search-result-icon">
+                                <div class="loading-small"></div>
+                            </div>
+                            <div class="search-result-info">
+                                <div class="search-result-meta">Searching...</div>
+                            </div>
+                        </div>
+                    `;
+                    searchResults.style.display = 'block';
+                    
+                    // Dapatkan saran pencarian (jika ada)
+                    const suggestions = await getSearchSuggestions(query);
+                    
+                    // Fetch search results dengan sortBy=relevance untuk hasil terbaik
+                    const results = await searchBusinesses(query, {
+                        limit: 5,
+                        sortBy: 'relevance',
+                        category: currentCategory !== 'all' ? currentCategory : null,
+                        subcategory: currentSubcategory !== 'all' ? currentSubcategory : null
+                    });
+                        
+                    // Format hasil dan tampilkan
+                    displaySearchResults(formatSearchResults(results, query, suggestions));
+                    
+                    // Jika di halaman listings, update tampilan
+                    if (currentPage === 'listings') {
+                        // Simpan query untuk referensi
+                        currentSearchQuery = query;
+                        
+                        // Update tampilan listings dengan hasil pencarian
+                        filteredBusinesses = results.data;
+                        renderBusinessesList();
+                        
+                        // Update judul dan subtitle
+                        document.getElementById('listingsTitle').textContent = `Search: "${query}"`;
+                        document.getElementById('listingsSubtitle').textContent = 
+                            `Found ${results.total} result${results.total !== 1 ? 's' : ''}`;
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    displaySearchResults([{
+                        type: 'error',
+                        icon: '⚠️',
+                        title: 'Search Error',
+                        subtitle: 'Please try again later'
+                    }]);
+                }
+            } else {
+                hideSearchResults();
+            
+                // Jika di halaman listings dan ini adalah reset pencarian, kembalikan tampilan asli
+                if (currentPage === 'listings' && currentSearchQuery) {
+                    currentSearchQuery = null;
+                    
+                    // Kembalikan filter kategori dan subkategori
+                    if (currentCategory !== 'all') {
+                        if (currentSubcategory !== 'all') {
+                            fetchBusinessesBySubcategory(currentCategory, currentSubcategory)
+                                .then(() => renderBusinessesList());
+                        } else {
+                            fetchBusinessesByCategory(currentCategory)
+                                .then(() => renderBusinessesList());
+                        }
+                    } else {
+                        fetchBusinesses().then(() => renderBusinessesList());
+                    }
+                    
+                    // Kembalikan judul asli
+                    const catObj = currentCategory !== 'all' 
+                        ? categories.find(c => c.id === currentCategory) 
+                        : null;
+                    
+                    document.getElementById('listingsTitle').textContent = 
+                        catObj ? catObj.name : 'All Businesses';
+                    
+                    document.getElementById('listingsSubtitle').textContent = 
+                        catObj ? `${filteredBusinesses.length} businesses found` : 'Discover amazing local services';
+                }
+            }
+        }, 300);
+    }
+
+
+
+        // Format search results for display
+        function formatSearchResults(results, query, suggestions = []) {
+    // Inisialisasi array hasil yang diformat
+    const formattedResults = [];
+    
+    // Jika tidak ada hasil bisnis dari API
+    if (!results || !results.data || results.data.length === 0) {
+        // Jika ada saran kata kunci, tampilkan
+        if (suggestions && suggestions.length > 0) {
+            return suggestions.slice(0, 3).map(suggestion => ({
+                type: 'suggestion',
+                icon: '🔍',
+                title: suggestion,
+                subtitle: 'Search suggestion',
+                id: suggestion
+            })).concat([{
+                type: 'message',
+                icon: '💡',
+                title: 'No exact matches',
+                subtitle: 'Try one of these suggestions'
+            }]);
+        }
+        
+        // Jika tidak ada hasil sama sekali, tampilkan pesan kosong
+        return [{
+            type: 'message',
+            icon: '🔍',
+            title: 'No results found',
+            subtitle: 'Try different keywords'
+        }];
+    }
+      
+    // Cari kategori yang cocok dengan query
+    const matchingCategories = categories.filter(category => 
+        category.name.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    // Tambahkan kategori yang cocok ke hasil
+    if (matchingCategories.length > 0) {
+        formattedResults.push(...matchingCategories.slice(0, 2).map(category => ({
+            type: 'category',
+            id: category.id,
+            icon: category.icon || '📁',
+            title: category.name,
+            subtitle: `${category.count || 0} businesses`,
+            matchText: highlightMatch(category.name, query)
+        })));
+    }
+    
+    // Tambahkan saran pencarian jika ada
+    if (suggestions && suggestions.length > 0) {
+        formattedResults.push(...suggestions.slice(0, 2).map(suggestion => ({
+            type: 'suggestion',
+            icon: '🔍',
+            title: suggestion,
+            subtitle: 'Search suggestion',
+            id: suggestion
+        })));
+    }
+     // Tambahkan hasil bisnis
+     results.data.forEach(business => {
+        // Temukan kategori dan subkategori
+        const category = categories.find(c => c.id === business.categoryId);
+        const categoryName = category ? category.name : 'Business';
+        
+        let subcategoryName = '';
+        if (category && business.subcategoryId && category.subcategories) {
+            const subcategory = category.subcategories.find(s => {
+                if (typeof s === 'object') return s.id === business.subcategoryId;
+                return s === business.subcategoryId;
+            });
+            
+            if (subcategory) {
+                subcategoryName = typeof subcategory === 'object' ? subcategory.name : subcategory;
+            }
+        }
+        
+        formattedResults.push({
+            type: 'business',
+            id: business.id,
+            icon: '🏢',
+            title: business.name,
+            subtitle: `${categoryName}${subcategoryName ? ' • ' + subcategoryName : ''} • ${business.rating || '0.0'}⭐`,
+            matchText: highlightMatch(business.name, query),
+            categoryId: business.categoryId
+        });
+    });
+        // Jika ada total hasil lebih dari yang ditampilkan
+        if (results.total > results.data.length) {
+        formattedResults.push({
+            type: 'more',
+            icon: '➕',
+            title: 'See all results',
+            subtitle: `${results.total} businesses found`,
+            query: query
+        });
+    }
+    
+    return formattedResults;
+}
+
+
+
+
+    
+        // Perform search with API results
+        function performSearch(query, results) {
+            if (!results || results.length === 0) {
+                displaySearchResults([]);
+                return;
+            }
+            
+            // Format results for display
+            const formattedResults = results.map(result => {
+                if (result.type === 'category') {
+                    return {
+                        type: 'category',
+                        id: result.id,
+                        title: result.name,
+                        subtitle: `${result.count} businesses`,
+                        icon: result.icon,
+                        matchText: highlightMatch(result.name, query)
+                    };
+                } else if (result.type === 'subcategory') {
+                    return {
+                        type: 'subcategory',
+                        id: result.id,
+                        categoryId: result.categoryId,
+                        title: result.name,
+                        subtitle: `in ${result.categoryName}`,
+                        icon: result.icon,
+                        matchText: highlightMatch(result.name, query)
+                    };
+                } else if (result.type === 'business') {
+                    return {
+                        type: 'business',
+                        id: result.id,
+                        title: result.name,
+                        subtitle: `${result.categoryDisplay} • ${result.rating}⭐`,
+                        icon: '🏢',
+                        matchText: highlightMatch(result.name, query)
+                    };
+                }
+                return result;
+            });
+            
+            displaySearchResults(formattedResults);
+        }
+    
+        // Handle search focus
+        function handleSearchFocus() {
+            const query = searchInput.value.trim();
+            if (query.length > 0) {
+                searchBusinesses(query).then(results => {
+                    performSearch(query, results);
+                }).catch(error => {
+                    console.error('Search error:', error);
+                });
+            }
+        }
+    
+        // Handle search blur
+        function handleSearchBlur() {
+            // Delay hiding to allow click on search results
+            setTimeout(() => {
+                hideSearchResults();
+            }, 200);
+        }
+    
+        // Display search results
+        function displaySearchResults(results) {
+    if (!results || results.length === 0) {
+        searchResults.innerHTML = `
+            <div class="search-result-item">
+                <div class="search-result-icon">🔍</div>
+                <div class="search-result-info">
+                    <div class="search-result-meta">No results found</div>
+                </div>
+            </div>
+        `;
+    } else {
+        searchResults.innerHTML = results.map(result => {
+            // Different rendering based on result type
+            if (result.type === 'message' || result.type === 'error') {
+                return `
+                    <div class="search-result-item search-message">
+                        <div class="search-result-icon">${result.icon || '🔍'}</div>
+                        <div class="search-result-info">
+                            <h4>${result.title || 'Message'}</h4>
+                            <div class="search-result-meta">${result.subtitle || ''}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (result.type === 'more') {
+                return `
+                    <div class="search-result-item search-more" onclick="handleSeeAllResults('${result.query}')">
+                        <div class="search-result-icon">${result.icon || '➕'}</div>
+                        <div class="search-result-info">
+                            <h4>${result.title || 'See all'}</h4>
+                            <div class="search-result-meta">${result.subtitle || ''}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (result.type === 'suggestion') {
+                return `
+                    <div class="search-result-item" onclick="handleSearchSuggestion('${result.title}')">
+                        <div class="search-result-icon">${result.icon || '🔍'}</div>
+                        <div class="search-result-info">
+                            <h4>${result.title || 'Suggestion'}</h4>
+                            <div class="search-result-meta">${result.subtitle || ''}</div>
+                        </div>
+                    </div>
+                `;
+                } else {
+                    // Default for business results
+                    return `
+                        <div class="search-result-item" onclick="handleSearchResultClick('${result.type}', '${result.id}')">
+                            <div class="search-result-icon">${result.icon || '🔍'}</div>
+                            <div class="search-result-info">
+                                <h4>${result.matchText || result.title || 'Result'}</h4>
+                                <div class="search-result-meta">${result.subtitle || ''}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+        
+        searchResults.style.display = 'block';
+    }
+
+    // Handle melihat semua hasil pencarian
+        function handleSeeAllResults(query) {
+            // Sembunyikan hasil pencarian
+            hideSearchResults();
+            
+            // Pergi ke halaman listings
+            showPage('listings', 'all');
+            
+            // Atur nilai input pencarian
+            searchInput.value = query;
+            
+            // Trigger pencarian untuk listings
+            handleSearchInput();
+        }
+
+        // Handle klik pada saran pencarian
+        function handleSearchSuggestion(suggestion) {
+            // Isi input pencarian dengan saran
+            searchInput.value = suggestion;
+            
+            // Trigger pencarian
+            handleSearchInput();
+        }
+
+        // Style tambahan untuk fitur pencarian
+        const searchStyle = document.createElement('style');
+        searchStyle.textContent = `
+            .search-result-item {
+                padding: 12px 15px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .search-result-item:hover {
+                background-color: var(--bg-hover);
+            }
+            
+            .search-result-icon {
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                color: var(--text-secondary);
+            }
+            
+            .search-result-info {
+                flex: 1;
+            }
+            
+            
+            .search-result-info h4 {
+                margin: 0 0 4px 0;
+                font-size: 14px;
+                color: var(--text-primary);
+            }
+            
+            .search-result-meta {
+                font-size: 12px;
+                color: var(--text-secondary);
+            }
+            
+            .search-highlight {
+                background-color: rgba(var(--primary-rgb), 0.2);
+                padding: 0 2px;
+                border-radius: 2px;
+                font-weight: 500;
+            }
+            
+            .search-message {
+                background-color: var(--bg-secondary);
+                cursor: default;
+            }
+            
+            .search-more {
+                background-color: var(--bg-accent);
+                font-weight: 500;
+            }
+            
+            .loading-small {
+                width: 16px;
+                height: 16px;
+                border: 2px solid rgba(var(--primary-rgb), 0.2);
+                border-top: 2px solid var(--primary);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(searchStyle);
+
+            
+                // Highlight search matches
+                function highlightMatch(text, query) {
+                    if (!text || !query) return text;
+                    const regex = new RegExp(`(${query})`, 'gi');
+                    return text.replace(regex, '<span class="search-highlight">$1</span>');
+                }
+            
+                // Hide search results
+                function hideSearchResults() {
+                    searchResults.style.display = 'none';
+                }
+            
+                // Clear search
+                function clearSearch() {
+                    searchInput.value = '';
+                    searchClear.style.display = 'none';
+                    hideSearchResults();
+                    
+                    if (currentPage === 'listings') {
+                        renderListings();
+                    }
+                }
+            
+                // Handle search result click
+            //     function handleSearchResultClick(type, id, categoryId = '') {
+            //     hideSearchResults();
+                
+            //     if (type === 'category') {
+            //         showPage('listings', id);
+                    
+            //         // Reset subcategory jika berpindah kategori
+            //         currentSubcategory = 'all';
+                    
+            //         // Update judul listings
+            //         const category = categories.find(c => c.id === id);
+            //         if (category) {
+            //             document.getElementById('listingsTitle').textContent = category.name;
+            //             document.getElementById('listingsSubtitle').textContent = `${category.count || 0} businesses`;
+            //         }
+            //     } else if (type === 'subcategory') {
+            //         showPage('listings', categoryId);
+            //         setTimeout(() => {
+            //             filterBySubcategory(id);
+            //         }, 100);
+            //     } else if (type === 'business') {
+            //         // Jika business memiliki categoryId, tampilkan listings kategori tersebut dulu
+            //         if (categoryId) {
+            //             showPage('listings', categoryId);
+            //             setTimeout(() => {
+            //                 openModal(id);
+            //             }, 300);
+            //         } else {
+            //             // Jika tidak, langsung buka modal
+            //             openModal(id);
+            //         }
+            //     } else if (type === 'suggestion') {
+            //         // Handle klik pada saran pencarian
+            //         searchInput.value = id; // id berisi teks saran
+            //         handleSearchInput();
+            //     }
+            // }
+            function handleSearchResultClick(type, id, additionalData = '') {
+            hideSearchResults();
+            
+            if (type === 'business') {
+                openModal(id);
+            } else if (type === 'category') {
+                showPage('listings', id);
+                
+                // Update UI untuk menunjukkan kategori yang dipilih
+                const category = categories.find(c => c.id === id);
+                if (category) {
+                    document.getElementById('listingsTitle').textContent = category.name;
+                    document.getElementById('listingsSubtitle').textContent = `${category.count || 0} businesses`;
+                }
+            }
+        }
+
+        // Style tambahan untuk hasil kategori dalam pencarian
+        const categoriesSearchStyle = document.createElement('style');
+        categoriesSearchStyle.textContent = `
+            .search-categories-section {
+                margin-bottom: 24px;
+                padding: 0 16px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 16px;
+                color: var(--text-primary);
+            }
+            
+            .category-cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 16px;
+            }
+            
+            .category-card.compact {
+                padding: 16px;
+                height: auto;
+                min-height: 120px;
+            }
+            
+            .category-card.compact .category-icon {
+                font-size: 24px;
+                margin-bottom: 12px;
+            }
+            
+            .category-card.compact .category-name {
+                font-size: 14px;
+            }
+            
+            .category-card.compact .category-count {
+                font-size: 12px;
+            }
+        `;
+        document.head.appendChild(categoriesSearchStyle);
+    
+        // Show page
+        function showPage(page, category = null) {
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(page + 'Page').classList.add('active');
+            
+            // Update active nav item
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageIndex = ['home', 'listings', 'favorites', 'profile'].indexOf(page);
+            if (pageIndex >= 0) {
+                navItems[pageIndex].classList.add('active');
+            }
+            
+            currentPage = page;
+            
+            if (page === 'listings') {
+                currentCategory = category || 'all';
+                currentSubcategory = 'all';
+                renderListings();
+            } else if (page === 'home') {
+                clearSearch();
+            }
+        }
+
+        // Format business hours for display
+        function formatBusinessHours(businessHours) {
+            if (!businessHours) return "Hours not available";
+            
+            // Check if hours are in the new format (open/close)
+            if (businessHours.open && businessHours.close) {
+                return `Daily: ${businessHours.open}-${businessHours.close}`;
+            }
+            
+            // For legacy format (if any)
+            return "Hours available on request";
+        }
+    
+            // Render categories
+            function renderCategories() {
+                const grid = document.getElementById('categoriesGrid');
+                
+                if (!categories || categories.length === 0) {
+                    grid.innerHTML = `
+                        <div style="text-align: center; padding: 40px; grid-column: span 2;">
+                            <div style="font-size: 40px; margin-bottom: 10px;">📋</div>
+                            <p style="margin-bottom: 10px; color: var(--text-primary); font-weight: 600;">No categories available</p>
+                            <p style="color: var(--text-secondary);">Check back later for updates</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                grid.innerHTML = categories.map((cat, index) => {
+                    // Periksa subcategories - pastikan itu array sebelum menggunakan slice/map
+                    let subcategoriesDisplay = 'Various services';
+                    if (cat.subcategories && Array.isArray(cat.subcategories) && cat.subcategories.length > 0) {
+                        subcategoriesDisplay = cat.subcategories.slice(0, 3).map(sc => {
+                            return typeof sc === 'object' ? sc.name : sc;
+                        }).join(' • ');
+                    }
+                    
+                    return `
+                        <div class="category-card" onclick="showPage('listings', '${cat.id}')" 
+                            data-aos="fade-up" data-aos-delay="${index * 100}">
+                            <span class="category-icon">${cat.icon || '📁'}</span>
+                            <div class="category-name">${cat.name}</div>
+                            <div class="category-count">${cat.count || 0} businesses</div>
+                            <div class="subcategories">${subcategoriesDisplay}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+    
+                // Render listings
+                async function renderListings() {
+                    const title = document.getElementById('listingsTitle');
+                    const subtitle = document.getElementById('listingsSubtitle');
+                    const filterChips = document.getElementById('filterChips');
+                    const subcategoryFilters = document.getElementById('subcategoryFilters');
+                    const businessesList = document.getElementById('businessesList');
+                    
+                    // Show loading
+                    businessesList.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div class="loading"></div>
+                            <p style="margin-top: 10px; color: var(--text-secondary);">Loading businesses...</p>
+                        </div>
+                    `;
+                    
+                    try {
+                        // Render filter chips first
+                        filterChips.innerHTML = `
+                            <div class="filter-chip ${currentCategory === 'all' ? 'active' : ''}" 
+                                onclick="filterByCategory('all')">All</div>
+                            ${categories.map(cat => `
+                                <div class="filter-chip ${currentCategory === cat.id ? 'active' : ''}" 
+                                    onclick="filterByCategory('${cat.id}')">${cat.icon || '📁'} ${cat.name}</div>
+                            `).join('')}
+                        `;
+                        
+                        // If we're filtering by category or subcategory, fetch the filtered data
+                        if (currentCategory !== 'all') {
+                            if (currentSubcategory !== 'all') {
+                                await fetchBusinessesBySubcategory(currentCategory, currentSubcategory);
+                            } else {
+                                await fetchBusinessesByCategory(currentCategory);
+                            }
+                            
+                            // Render subcategory filters
+                            const cat = categories.find(c => c.id === currentCategory);
+                            if (cat && cat.subcategories && cat.subcategories.length > 0) {
+                                subcategoryFilters.innerHTML = `
+                                    <div class="subcategory-chip ${currentSubcategory === 'all' ? 'active' : ''}" 
+                                        onclick="filterBySubcategory('all')">All ${cat.name}</div>
+                                    ${cat.subcategories.map(sub => `
+                                        <div class="subcategory-chip ${currentSubcategory === (sub.id || sub) ? 'active' : ''}" 
+                                            onclick="filterBySubcategory('${sub.id || sub}')">${typeof sub === 'object' ? sub.name : sub}</div>
+                                    `).join('')}
+                                `;
+                                subcategoryFilters.style.display = 'flex';
+                            } else {
+                                subcategoryFilters.style.display = 'none';
+                            }
+                            
+                            // Update title
+                            const catObj = categories.find(c => c.id === currentCategory);
+                            title.textContent = catObj ? catObj.name : 'Businesses';
+                            subtitle.textContent = catObj ? `${filteredBusinesses.length} businesses found` : 'Explore local businesses';
+                            
+                        } else {
+                            // Get all businesses
+                            await fetchBusinesses();
+                            
+                            // Hide subcategory filters
+                            subcategoryFilters.style.display = 'none';
+                            
+                            // Update title
+                            title.textContent = 'All Businesses';
+                            subtitle.textContent = 'Discover amazing local services';
+                        }
+                        
+                        // Check if we have any businesses to display
+                        if (!filteredBusinesses || filteredBusinesses.length === 0) {
+                            businessesList.innerHTML = `
+                                <div class="empty-state">
+                                    <div class="empty-icon">🔍</div>
+                                    <div class="empty-title">No businesses found</div>
+                                    <p>Try adjusting your search or filter</p>
+                                </div>
+                            `;
+                            return;
+                        }
+                        
+                        // Render businesses
+                        renderBusinessesList();
+                        
+                    } catch (error) {
+                        console.error('Error rendering listings:', error);
+                        businessesList.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">⚠️</div>
+                                <div class="empty-title">Error loading businesses</div>
+                                <p>Please try again later</p>
+                                <button class="action-btn btn-primary" style="margin-top: 15px;" onclick="renderListings()">
+                                    <i class="fas fa-redo"></i> Retry
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+    
+        // Filter by category
+        async function filterByCategory(categoryId) {
+            try {
+                showListingsLoading();
+                currentCategory = categoryId;
+                currentSubcategory = 'all';
+                
+                // Update UI
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                    chip.classList.toggle('active', chip.getAttribute('data-id') === categoryId);
+                });
+                
+                // Fetch data
+                if (categoryId === 'all') {
+                    await fetchBusinesses();
+                } else {
+                    await fetchBusinessesByCategory(categoryId);
+                }
+                
+                // Render subcategory filters
+                renderSubcategoryFilters();
+                
+                // Render business list
+                renderBusinessesList();
+            } catch (error) {
+                console.error('Error filtering by category:', error);
+                showListingsError('Failed to load businesses. Please try again.');
+            }
+        }
+
+        // Filter by subcategory
+        async function filterBySubcategory(subcategoryId) {
+            try {
+                showListingsLoading();
+                currentSubcategory = subcategoryId;
+                
+                // Update UI
+                document.querySelectorAll('.subcategory-chip').forEach(chip => {
+                    chip.classList.toggle('active', chip.getAttribute('data-id') === subcategoryId);
+                });
+                
+                // Fetch data
+                if (subcategoryId === 'all') {
+                    await fetchBusinessesByCategory(currentCategory);
+                } else {
+                    await fetchBusinessesBySubcategory(currentCategory, subcategoryId);
+                }
+                
+                // Render business list
+                renderBusinessesList();
+            } catch (error) {
+                console.error('Error filtering by subcategory:', error);
+                showListingsError('Failed to load businesses. Please try again.');
+            }
+        }
+
+    // Render subcategory filters
+    function renderSubcategoryFilters() {
+        const subcategoryFilters = document.getElementById('subcategoryFilters');
+        
+        if (currentCategory === 'all') {
+            subcategoryFilters.style.display = 'none';
+            return;
+        }
+        
+        const category = categories.find(c => c.id === currentCategory);
+        if (!category || !category.subcategories || category.subcategories.length === 0) {
+            subcategoryFilters.style.display = 'none';
+            return;
+        }
+        
+        subcategoryFilters.innerHTML = `
+            <div class="subcategory-chip active" data-id="all" onclick="filterBySubcategory('all')">
+                All ${category.name}
+            </div>
+            ${category.subcategories.map(subcategory => `
+                <div class="subcategory-chip" data-id="${subcategory.id}" 
+                    onclick="filterBySubcategory('${subcategory.id}')">
+                    ${subcategory.name}
+                </div>
+            `).join('')}
+        `;
+        
+        subcategoryFilters.style.display = 'flex';
+    }
+    
+        // Get subcategory name
+        function getSubcategoryName(categoryId, subcategoryId) {
+            const category = categories.find(c => c.id === categoryId);
+            if (category && category.subcategories) {
+                const subcategory = category.subcategories.find(s => s.id === subcategoryId);
+                return subcategory ? subcategory.name : 'General';
+            }
+            return 'General';
+        }
+    
+      //Open modal
+        async function openModal(businessId) {
+        try {
+        // Show loading in modal
+        document.getElementById('modalDetails').innerHTML = `
+            <div style="text-align: center; padding: 30px;">
+                <div class="loading"></div>
+                <p style="margin-top: 15px; color: var(--text-secondary);">Loading details...</p>
+            </div>
+        `;
+        
+        document.getElementById('businessModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Fetch business details
+        const business = await fetchBusinessDetail(businessId);
+        
+        if (!business || Object.keys(business).length === 0) {
+            throw new Error('Business not found');
+        }
+        
+        // Use the first image if available, otherwise use placeholder
+        const imageUrl = business.images && business.images.length > 0 
+            ? business.images[0] 
+            : '/api/placeholder/300/160';
+            
+        document.getElementById('modalImage').src = imageUrl;
+        document.getElementById('modalTitle').textContent = business.name;
+        
+        // Find category name
+        const category = categories.find(c => c.id === business.categoryId);
+        const categoryName = category ? category.name : 'General';
+        document.getElementById('modalCategory').textContent = categoryName;
+        
+        // Format business hours
+        const hours = formatBusinessHours(business.businessHours);
+        
+        document.getElementById('modalDetails').innerHTML = `
+            <div class="business-detail">
+                <i class="fas fa-tag"></i>
+                ${business.subcategoryId ? getSubcategoryName(business.categoryId, business.subcategoryId) : 'General'}
+            </div>
+            <div class="business-detail">
+                <i class="fas fa-map-marker-alt"></i>
+                ${business.address || 'Address not available'}
+            </div>
+            <div class="business-detail">
+                <i class="fas fa-phone"></i>
+                ${business.phone || 'Phone not available'}
+            </div>
+            <div class="business-detail">
+                <div class="business-rating">
+                    <i class="fas fa-star"></i>
+                    <span>${business.rating || '0.0'} (${business.reviewCount || '0'} reviews)</span>
+                </div>
+            </div>
+            <div class="business-detail">
+                <i class="fas fa-clock"></i>
+                ${hours}
+            </div>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                <p style="color: var(--text-secondary); line-height: 1.6;">${business.description || 'No description available'}</p>
+            </div>
+            ${business.keywords && business.keywords.length > 0 ? `
+                <div style="margin-top: 15px;">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Keywords:</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${business.keywords.map(keyword => `
+                            <span style="background: var(--bg-secondary); color: var(--text-secondary); 
+                                        padding: 4px 8px; border-radius: 8px; font-size: 12px;">${keyword}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            ${business.email ? `
+                <div class="business-detail" style="margin-top: 15px;">
+                    <i class="fas fa-envelope"></i>
+                    ${business.email}
+                </div>
+            ` : ''}
+            ${business.website ? `
+                <div class="business-detail">
+                    <i class="fas fa-globe"></i>
+                    <a href="${business.website}" target="_blank" style="color: var(--primary);">${business.website}</a>
+                </div>
+            ` : ''}
+        `;
+
+        // Setup action buttons
+        document.getElementById('callBtn').onclick = () => {
+            window.location.href = `tel:${business.phone}`;
+        };
+        
+        document.getElementById('directionBtn').onclick = () => {
+            if (business.latitude && business.longitude) {
+                window.open(`https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`, '_blank');
+            } else {
+                openDirections(business.address);
+            }
+        };
+            } catch (error) {
+                console.error('Error opening modal:', error);
+                document.getElementById('modalDetails').innerHTML = `
+                    <div style="text-align: center; padding: 30px;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+                        <p style="margin-bottom: 20px; color: var(--text-primary); font-weight: 600;">Failed to load details</p>
+                        <button class="action-btn btn-primary" style="display: inline-block;" onclick="openModal(${businessId})">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+    
+        // Close modal
+        function closeModal() {
+            document.getElementById('businessModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    
+        // Open directions
+        function openDirections(address) {
+            const encodedAddress = encodeURIComponent(address);
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+        }
+    
+        // Show listings loading state
+        function showListingsLoading() {
+            document.getElementById('businessesList').innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <div class="loading"></div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Loading businesses...</p>
+                </div>
+            `;
+        }
+        
+        // Show listings error
+        function showListingsError(message) {
+            document.getElementById('businessesList').innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+                    <p style="margin-bottom: 20px; color: var(--text-primary); font-weight: 600;">${message}</p>
+                    <button class="action-btn btn-primary" style="display: inline-block;" onclick="renderListings()">
+                        <i class="fas fa-redo"></i> Retry
+                    </button>
+                </div>
+            `;
+        }
+
+        // Render businesses in the listings page
+        function renderBusinessesList() {
+            const businessesList = document.getElementById('businessesList');
+            
+            if (!filteredBusinesses || filteredBusinesses.length === 0) {
+                businessesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">No businesses found</div>
+                        <p>Try adjusting your search or filter</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            businessesList.innerHTML = filteredBusinesses.map((business, index) => {
+                // Get image URL - handle array or string
+                let imageUrl = '/api/placeholder/300/160';
+                if (business.images) {
+                    if (Array.isArray(business.images) && business.images.length > 0) {
+                        imageUrl = business.images[0];
+                    } else if (typeof business.images === 'string') {
+                        imageUrl = business.images;
+                    }
+                }
+                
+                // Get category name
+                let categoryName = 'General';
+                let subcategoryName = 'General';
+                
+                const category = categories.find(c => c.id === business.categoryId);
+                if (category) {
+                    categoryName = category.name;
+                    
+                    // Get subcategory name if available
+                    if (business.subcategoryId && category.subcategories) {
+                        const subcategory = category.subcategories.find(s => 
+                            s.id === business.subcategoryId || 
+                            (typeof s === 'string' && s === business.subcategoryId)
+                        );
+                        
+                        if (subcategory) {
+                            subcategoryName = typeof subcategory === 'object' ? subcategory.name : subcategory;
+                        }
+                    }
+                }
+                
+                return `
+                    <div class="business-card" onclick="openModal('${business.id}')" 
+                        data-aos="fade-up" data-aos-delay="${index * 100}">
+                        <img src="${imageUrl}" alt="${business.name}" class="business-image">
+                        <div class="business-content">
+                            <div class="business-header">
+                                <div class="business-info">
+                                    <h3>${business.name}</h3>
+                                    <div class="business-category">${categoryName}</div>
+                                    <div class="business-subcategory">${subcategoryName}</div>
+                                </div>
+                                <div class="business-rating">
+                                    <span class="rating-stars">⭐</span>
+                                    <span>${business.rating || '0.0'}</span>
+                                </div>
+                            </div>
+                            <div class="business-details">
+                                <div class="business-detail">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    ${business.address || 'Address not available'}
+                                </div>
+                                <div class="business-detail">
+                                    <i class="fas fa-phone"></i>
+                                    ${business.phone || 'Phone not available'}
+                                </div>
+                                <div class="business-detail">
+                                    <i class="fas fa-star"></i>
+                                    ${business.rating || '0.0'} (${business.reviewCount || '0'} reviews)
+                                </div>
+                            </div>
+                            <div class="business-actions">
+                                <button class="action-btn btn-primary" onclick="event.stopPropagation(); window.location.href='tel:${business.phone}'">
+                                    <i class="fas fa-phone"></i> Call
+                                </button>
+                                <button class="action-btn btn-secondary" onclick="event.stopPropagation(); openDirections('${encodeURIComponent(business.address || '')}')">
+                                    <i class="fas fa-map-marker-alt"></i> Directions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Re-initialize AOS for new elements
+            setTimeout(() => AOS.refresh(), 100);
+        }
+
+        // Format business hours for display
+        function formatBusinessHours(businessHours) {
+            if (!businessHours) return "Hours not available";
+            
+            // Check if hours are in the new format (open/close)
+            if (businessHours.open && businessHours.close) {
+                return `Daily: ${businessHours.open}-${businessHours.close}`;
+            }
+            
+            // For legacy format (if any)
+            return "Hours available on request";
+        }
+
+        // Get subcategory name from id
+        function getSubcategoryName(categoryId, subcategoryId) {
+            const category = categories.find(c => c.id === categoryId);
+            if (!category || !category.subcategories) return 'General';
+            
+            const subcategory = category.subcategories.find(s => s.id === subcategoryId);
+            return subcategory ? subcategory.name : 'General';
+        }
+    
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    // ...existing code...
+</body>
+</html>
