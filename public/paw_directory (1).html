@@ -2257,7 +2257,66 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
         }
 
         
-        
+        // Dedicated function for the second admin login form
+        function handleAdminLogin2(event) {
+            event.preventDefault();
+            console.log("Admin login form 2 submitted");
+            
+            const username = document.getElementById('adminUsername2').value.trim();
+            const password = document.getElementById('adminPassword2').value;
+            const errorElement = document.getElementById('adminLoginError2');
+            
+            // Reset error
+            errorElement.style.display = 'none';
+            
+            // Simple validation
+            if (!username || !password) {
+                errorElement.textContent = 'Please enter both username and password';
+                errorElement.style.display = 'block';
+                return false;
+            }
+            
+            // Show loading
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<div class="loading" style="width: 20px; height: 20px;"></div>';
+            submitBtn.disabled = true;
+            
+            // Call API directly in this function to avoid conflicts
+            fetch(`${API_BASE_URL}/auth/admin/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Invalid credentials');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                localStorage.setItem('adminToken', data.token);
+                localStorage.setItem('adminUser', JSON.stringify(data.user));
+                updateUserInterface(false, true);
+                showPage('home');
+                showToast('Login successful', 'success');
+            })
+            .catch(error => {
+                errorElement.textContent = error.message || 'Login failed';
+                errorElement.style.display = 'block';
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+            
+            return false;
+        }
+                
         
         // Update UI based on login state
         function updateUserInterface(isLoggedIn, isLoggedInAdmin) {
@@ -2450,20 +2509,20 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
                     </div>
                     
                     <div id="adminLoginForm" class="login-form">
-                        <form onsubmit="handleAdminLogin(event)">
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Admin Username</label>
-                                <input type="text" id="adminUsername2" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
-                            </div>
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Admin Password</label>
-                                <input type="password" id="adminPassword2" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
-                            </div>
-                            <button type="submit" class="action-btn btn-primary" style="width: 100%; background-color: #8b5cf6;">
-                                <i class="fas fa-lock"></i> Login as Admin
-                            </button>
-                            <div id="adminLoginError2" style="color: var(--danger); margin-top: 15px; text-align: center; display: none;"></div>
-                        </form>
+                     <form id="adminLoginForm2" onsubmit="return handleAdminLogin2(event)">
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Admin Username</label>
+                            <input type="text" id="adminUsername2" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Admin Password</label>
+                            <input type="password" id="adminPassword2" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                        </div>
+                        <button type="submit" class="action-btn btn-primary" style="width: 100%; background-color: #8b5cf6;">
+                            <i class="fas fa-lock"></i> Login as Admin
+                        </button>
+                        <div id="adminLoginError2" style="color: var(--danger); margin-top: 15px; text-align: center; display: none;"></div>
+                    </form>
                     </div>
                 </div>
             `;
@@ -4065,6 +4124,9 @@ function renderSearchResultsPage(searchResults, query) {
 
         // Handle admin login
         async function handleAdminLogin(event) {
+
+            console.log(1);
+            
             event.preventDefault();
             
             const username = document.getElementById('adminUsername').value.trim();
@@ -7185,7 +7247,7 @@ function showLoginForm() {
             </div>
             
             <div id="adminLoginForm" class="login-form">
-                <form onsubmit="handleAdminLogin(event)">
+               <form id="adminLoginForm2" onsubmit="return handleAdminLogin2(event)">
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; margin-bottom: 5px; font-weight: 500;">Admin Username</label>
                         <input type="text" id="adminUsername2" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
@@ -7203,6 +7265,30 @@ function showLoginForm() {
         </div>
     `;
 }
+
+// Add direct event listeners after page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Fix admin login button
+    const adminLoginForm = document.getElementById('adminLoginForm');
+    if (adminLoginForm) {
+        adminLoginForm.onsubmit = function(event) {
+            event.preventDefault();
+            handleAdminLogin(event);
+        };
+    }
+    
+    // Also attach click handlers directly to the buttons
+    const adminLoginBtn = document.querySelector('#adminLoginForm button[type="submit"]');
+    if (adminLoginBtn) {
+        adminLoginBtn.onclick = function(event) {
+            event.preventDefault();
+            handleAdminLogin(event);
+        };
+    }
+    
+    console.log('Direct event handlers attached to admin login');
+});
+
 
 // Handle registration form submission
 async function handleRegister(event) {
