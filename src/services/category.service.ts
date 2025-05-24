@@ -285,18 +285,32 @@ export class CategoryService {
     await this.redisService.del(`${this.SUBCATEGORY_KEY}:${id}`)
   }
 
-  async getCategoriesWithSubcategories(): Promise<(Category & { subcategories: Subcategory[] })[]> {
+  async getCategoriesWithSubcategories(): Promise<(Category & { subcategories: Subcategory[]; businessCount: number })[]> {
     const categories = await this.findAllCategories()
-    const result: (Category & { subcategories: Subcategory[] })[] = []
+    const result: (Category & { subcategories: Subcategory[]; businessCount: number })[] = []
 
     for (const category of categories) {
       const subcategories = await this.findSubcategoriesByCategory(category.id)
+
+      // Get business count for this category
+      const businessCount = await this.getBusinessCountForCategory(category.id)
+
       result.push({
         ...category,
         subcategories,
+        businessCount,
       })
     }
 
     return result
+  }
+
+  // Add this new method to get business count
+  async getBusinessCountForCategory(categoryId: string): Promise<number> {
+    // Get businesses directly using this category
+    const directBusinesses = (await this.redisService.scard(`category:businesses:${categoryId}`)) || 0
+
+    // Return total count (businesses directly in category + businesses in subcategories)
+    return directBusinesses
   }
 }

@@ -39,6 +39,17 @@ export class BusinessService {
     // Update indexes
     await this.updateIndexes(business)
 
+    // After saving the business
+    if (createBusinessDto.categoryId) {
+      // Add to category counter
+      await this.redisService.sadd(`category:businesses:${createBusinessDto.categoryId}`, businessId)
+    }
+
+    if (createBusinessDto.subcategoryId) {
+      // Add to subcategory counter
+      await this.redisService.sadd(`subcategory:businesses:${createBusinessDto.subcategoryId}`, businessId)
+    }
+
     return business
   }
 
@@ -147,6 +158,27 @@ export class BusinessService {
       updatedAt: new Date().toISOString(),
     }
 
+    if (updateBusinessDto.categoryId && updateBusinessDto.categoryId !== existingBusiness.categoryId) {
+      // Remove from old category counter
+      if (existingBusiness.categoryId) {
+        await this.redisService.srem(`category:businesses:${existingBusiness.categoryId}`, id)
+      }
+
+      // Add to new category counter
+      await this.redisService.sadd(`category:businesses:${updateBusinessDto.categoryId}`, id)
+    }
+
+    // If subcategory changed, update the counters
+    if (updateBusinessDto.subcategoryId && updateBusinessDto.subcategoryId !== existingBusiness.subcategoryId) {
+      // Remove from old subcategory counter
+      if (existingBusiness.subcategoryId) {
+        await this.redisService.srem(`subcategory:businesses:${existingBusiness.subcategoryId}`, id)
+      }
+
+      // Add to new subcategory counter
+      await this.redisService.sadd(`subcategory:businesses:${updateBusinessDto.subcategoryId}`, id)
+    }
+
     // Update business data
     await this.redisService.hset(`${this.BUSINESS_KEY}:${id}`, 'data', JSON.stringify(updatedBusiness))
 
@@ -161,6 +193,16 @@ export class BusinessService {
 
   async remove(id: string): Promise<void> {
     const business = await this.findOne(id)
+
+    // Remove from category counter
+    if (business.categoryId) {
+      await this.redisService.srem(`category:businesses:${business.categoryId}`, id)
+    }
+
+    // Remove from subcategory counter
+    if (business.subcategoryId) {
+      await this.redisService.srem(`subcategory:businesses:${business.subcategoryId}`, id)
+    }
 
     // Remove from business list
     await this.redisService.srem(this.BUSINESS_LIST_KEY, id)

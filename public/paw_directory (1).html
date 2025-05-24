@@ -2005,7 +2005,7 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
                 id: cat.id || cat._id,
                 name: cat.name,
                 icon: cat.icon || '📁',
-                count: cat.count || 0,
+                count: cat.businessCount|| 0,
                 subcategories: subcategories
             };
         });
@@ -3537,6 +3537,9 @@ function renderSearchResultsPage(searchResults, query) {
                     `;
                     return;
                 }
+
+                console.log('Rendering categories:', categories);
+                
                 
                 grid.innerHTML = categories.map((cat, index) => {
                     // Periksa subcategories - pastikan itu array sebelum menggunakan slice/map
@@ -3546,6 +3549,8 @@ function renderSearchResultsPage(searchResults, query) {
                             return typeof sc === 'object' ? sc.name : sc;
                         }).join(' • ');
                     }
+
+
                     
                     return `
                         <div class="category-card" onclick="showPage('listings', '${cat.id}')" 
