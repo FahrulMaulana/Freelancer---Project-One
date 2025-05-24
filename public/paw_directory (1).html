@@ -832,15 +832,26 @@
             border: none;
             border-radius: 50%;
             color: white;
-            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
             transition: all 0.3s ease;
             z-index: 150;
         }
 
+        .floating-add i {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
         .floating-add:hover {
-            transform: scale(1.1) rotate(45deg);
+            transform: scale(1.1);
             box-shadow: 0 12px 35px rgba(99, 102, 241, 0.6);
         }
 
@@ -1169,6 +1180,21 @@
 
         .admin-table tr:hover {
             background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        .admin-table th {
+            display: table-cell !important;
+            visibility: visible !important;
+            color: white !important;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+            padding: 15px !important;
+            font-weight: 600 !important;
+            text-align: left !important;
+            border-bottom: 1px solid var(--border) !important;
+        }
+
+        .admin-table thead {
+            display: table-header-group !important;
         }
 
         @keyframes spin {
@@ -2051,22 +2077,32 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
 
         // Fetch user favorites
         async function fetchUserFavorites() {
-        try {
-            // Cek apakah user sudah login
-            if (!isLoggedIn()) {
-                // Tampilkan pesan login required di favoritesContent
-                document.getElementById('favoritesContent').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🔐</div>
-                        <div class="empty-title">Login Required</div>
-                        <p>Please login to add businesses to your favorites</p>
-                        <button class="action-btn btn-primary" style="margin-top: 20px;" onclick="showPage('profile')">
-                            <i class="fas fa-sign-in-alt"></i> Login
-                        </button>
-                    </div>
-                `;
-                return;
-            }
+            try {
+                // Cek apakah user sudah login
+                if (!isLoggedIn() && !isLoggedInAdmin()) {
+        // Tampilkan pesan login required di favoritesContent
+            document.getElementById('favoritesContent').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🔐</div>
+                    <div class="empty-title">Login Required</div>
+                    <p>Please login to add businesses to your favorites</p>
+                    <button class="action-btn btn-primary" style="margin-top: 20px;" onclick="showPage('profile')">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </div>
+            `;
+            return;
+                } else if (isLoggedInAdmin()) {
+                    // Jika admin yang login, tampilkan pesan khusus
+                    document.getElementById('favoritesContent').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔐</div>
+                            <div class="empty-title">ADMIN</div>
+                            <p>This is a User Page</p>
+                        </div>
+                    `;
+                    return;
+                }
             
             // Tampilkan loading state di favoritesContent
             document.getElementById('favoritesContent').innerHTML = `
@@ -2544,6 +2580,7 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
                 }
               }
            }
+           updateFloatingAddButton();
         }
 
 
@@ -5422,40 +5459,139 @@ function renderSearchResultsPage(searchResults, query) {
         }
 
         // Edit category (admin)
-        function editCategory(categoryId) {
-            try {
-                // Find category
-                const category = categories.find(c => c.id === categoryId);
-                if (!category) {
-                    throw new Error('Category not found');
-                }
-                
-                // Populate form
-                const form = document.getElementById('addCategoryForm');
-                form.querySelector('[name="name"]').value = category.name || '';
-                form.querySelector('[name="description"]').value = category.description || '';
-                
-                // Generate slug if missing, otherwise use existing
-                if (form.querySelector('[name="slug"]')) {
-                    form.querySelector('[name="slug"]').value = category.slug || 
-                        category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 100);
-                }
-                
-                // Set form to edit mode
+// Edit category (admin)
+function editCategory(categoryId) {
+    try {
+        // Find category
+        const category = categories.find(c => c.id === categoryId);
+        if (!category) {
+            throw new Error('Category not found');
+        }
+        
+        console.log('Editing category:', category); // Debug log
+        
+        // Show the form container first
+        const formContainer = document.getElementById('categoryFormContainer');
+        formContainer.style.display = 'block';
+        
+        // Then populate form with current values - using setTimeout to ensure elements are accessible
+        setTimeout(() => {
+            const nameField = document.getElementById('categoryName');
+            const iconField = document.getElementById('categoryIcon');
+            const descriptionField = document.getElementById('categoryDescription');
+            
+            if (nameField) nameField.value = category.name || '';
+            if (iconField) iconField.value = category.icon || '';
+            if (descriptionField) descriptionField.value = category.description || '';
+            
+            console.log('Form fields populated:', {
+                name: nameField?.value,
+                icon: iconField?.value,
+                description: descriptionField?.value
+            });
+            
+            // Set form to edit mode
+            const form = document.getElementById('addCategoryForm');
+            if (form) {
                 form.setAttribute('data-category-id', categoryId);
                 
                 // Change button text
                 const submitBtn = form.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Category';
-                
-                // Show form
-                showAddCategoryForm();
-                
-            } catch (error) {
-                console.error('Error editing category:', error);
-                showToast('Error: ' + error.message, 'error');
+                if (submitBtn) {
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Category';
+                }
             }
+        }, 50);
+        
+        // Use animation to show the form (similar to showAddCategoryForm)
+        formContainer.style.opacity = '0';
+        formContainer.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            formContainer.style.opacity = '1';
+            formContainer.style.transform = 'translateY(0)';
+            // Scroll to the form
+            formContainer.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+        
+    } catch (error) {
+        console.error('Error editing category:', error);
+        showToast('Error: ' + error.message, 'error');
+    }
+}
+
+// Add event listener for adding/editing category
+document.getElementById('addCategoryForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    try {
+        // Show loading state
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<div class="loading" style="width: 20px; height: 20px;"></div>';
+        submitBtn.disabled = true;
+        
+        // Get form data
+        const formData = new FormData(event.target);
+        const categoryData = {
+            name: formData.get('name'),
+            icon: formData.get('icon'),
+            description: formData.get('description')
+        };
+        
+        // Check if we're in edit mode
+        const categoryId = event.target.getAttribute('data-category-id');
+        let response;
+        
+        if (categoryId) {
+            // Edit mode
+            response = await fetch(`${API_BASE_URL}/categories/${categoryId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(categoryData)
+            });
+        } else {
+            // Add mode
+            response = await fetch(`${API_BASE_URL}/categories`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(categoryData)
+            });
         }
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to save category');
+        }
+        
+        // Show success message
+        showToast(categoryId ? 'Category updated successfully' : 'Category created successfully', 'success');
+        
+        // Reset form, remove edit mode attribute, and hide form
+        event.target.reset();
+        event.target.removeAttribute('data-category-id');
+        hideAddCategoryForm();
+        
+        // Refresh categories
+        await fetchCategories();
+        loadCategoriesForAdmin();
+        
+    } catch (error) {
+        console.error('Error saving category:', error);
+        showToast('Error: ' + error.message, 'error');
+    } finally {
+        // Restore button
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+    }
+});
 
         // Update category (admin)
         async function updateCategory(categoryId, event) {
@@ -5537,30 +5673,48 @@ function renderSearchResultsPage(searchResults, query) {
 
         // Call this in the init function
         function enhancedInit() {
-            // Existing init code
-            AOS.init({
-                duration: 800,
-                easing: 'ease-in-out',
-                once: true
-            });
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            // Fetch data and render UI
-            fetchCategories().then(() => {
-                renderCategories();
-                return fetchBusinesses();
-            }).then(() => {
-                renderListings();
-            }).catch(error => {
-                console.error('Error initializing app:', error);
-                showError('Failed to load data. Please try again later.');
-            });
-            
-            // Initialize admin functionality
-            initAdminFunctionality();
+    // Existing init code
+    AOS.init({
+        duration: 800,
+        easing: 'ease-in-out',
+        once: true
+    });
+    
+    // Setup event listeners
+    setupEventListeners();
+    
+    // Update floating add button visibility
+    updateFloatingAddButton();
+    
+    // Fetch data and render UI
+    fetchCategories().then(() => {
+        renderCategories();
+        return fetchBusinesses();
+    }).then(() => {
+        renderListings();
+    }).catch(error => {
+        console.error('Error initializing app:', error);
+        showError('Failed to load data. Please try again later.');
+    });
+    
+    // Initialize admin functionality
+    initAdminFunctionality();
+}
+
+function updateFloatingAddButton() {
+    const floatingAddButton = document.querySelector('.floating-add');
+    
+    if (floatingAddButton) {
+        // Show button only if user is admin
+        if (isLoggedInAdmin()) {
+            floatingAddButton.style.display = 'flex';
+            floatingAddButton.innerHTML = '<i class="fas fa-cog"></i>';
+        } else {
+            // Hide the button if not admin
+            floatingAddButton.style.display = 'none';
         }
+    }
+}
 
         // When page loads, call our enhanced init
         document.addEventListener('DOMContentLoaded', enhancedInit);
@@ -5642,6 +5796,7 @@ function renderSearchResultsPage(searchResults, query) {
             updateUserInterface(false, false);
             showPage('home');
             closeProfileDropdown();
+            updateFloatingAddButton();
             
             // Tampilkan pesan sukses
             showToast('Logged out successfully', 'success');
@@ -6324,50 +6479,6 @@ async function handleAddSubcategoryForm(event) {
     }
 }
 
-// Function to edit subcategory
-async function editSubcategory(subcategoryId) {
-    try {
-        // Show loading
-        showToast('Loading subcategory details...', 'info');
-        
-        // Find subcategory
-        const subcategory = allSubcategories.find(s => s.id === subcategoryId);
-        
-        if (!subcategory) {
-            // Try to fetch from API if not found locally
-            const response = await fetch(`${API_BASE_URL}/categories/subcategories/${subcategoryId}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error('Subcategory not found');
-            }
-            
-            subcategory = await response.json();
-        }
-        
-        // Hide list and add form
-        document.getElementById('subcategoryListContainer').style.display = 'none';
-        document.getElementById('addSubcategoryFormContainer').style.display = 'none';
-        
-        // Set data in edit form
-        document.getElementById('editSubcategoryId').value = subcategoryId;
-        document.getElementById('editSubcategoryName').value = subcategory.name || '';
-        document.getElementById('editSubcategorySlug').value = subcategory.slug || '';
-        document.getElementById('editSubcategoryDescription').value = subcategory.description || '';
-        document.getElementById('editSubcategoryCategory').value = subcategory.categoryId || '';
-        
-        // Show edit form
-        document.getElementById('editSubcategoryFormContainer').style.display = 'block';
-        
-    } catch (error) {
-        console.error('Error editing subcategory:', error);
-        showToast('Error: ' + error.message, 'error');
-    }
-}
-
 // Function to hide edit subcategory form
 function hideEditSubcategoryForm() {
     // Hide edit form, show list
@@ -6477,7 +6588,7 @@ async function deleteSubcategory(subcategoryId) {
         showToast('Deleting subcategory...', 'info');
         
         // Send delete request
-        const response = await fetch(`${API_BASE_URL}/subcategories/${subcategoryId}`, {
+        const response = await fetch(`${API_BASE_URL}/categories/subcategories/${subcategoryId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
@@ -6754,6 +6865,430 @@ function hideSubcategoryForm() {
 
 // Update onclick handler untuk tombol Add Subcategory
 document.querySelector('.admin-section-header button').onclick = createSubcategoryForm;
+
+
+// Fungsi untuk mengedit subcategory dengan membuat form langsung di DOM
+function createEditSubcategoryForm(subcategoryId) {
+    console.log('Creating edit subcategory form directly in DOM', subcategoryId);
+    
+    // Cari parent container
+    const parentContainer = document.getElementById('manage-subcategories-content');
+    if (!parentContainer) {
+        console.error('Parent container not found');
+        showToast('Error: Cannot create edit form', 'error');
+        return;
+    }
+    
+    // Cari subcategory yang akan diedit
+    const subcategory = allSubcategories.find(s => s.id === subcategoryId);
+    if (!subcategory) {
+        console.error('Subcategory not found:', subcategoryId);
+        showToast('Error: Subcategory not found', 'error');
+        return;
+    }
+    
+    // Cari parent category
+    const parentCategory = categories.find(c => c.id === subcategory.categoryId);
+    
+    // Sembunyikan container list jika ada
+    const subcategoryListContainer = document.getElementById('subcategoryListContainer');
+    if (subcategoryListContainer) {
+        subcategoryListContainer.style.display = 'none';
+    }
+    
+    // Hapus form lama jika ada
+    const existingForm = document.getElementById('dynamic-subcategory-edit-form-container');
+    if (existingForm) {
+        existingForm.remove();
+    }
+    
+    // Buat container baru
+    const formContainer = document.createElement('div');
+    formContainer.id = 'dynamic-subcategory-edit-form-container';
+    formContainer.style.backgroundColor = 'white';
+    formContainer.style.padding = '25px';
+    formContainer.style.borderRadius = '12px';
+    formContainer.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
+    formContainer.style.marginTop = '20px';
+    
+    // Set HTML content untuk form
+    formContainer.innerHTML = `
+        <div class="admin-section-header">
+            <h2 style="font-size: 24px; margin: 0; padding-bottom: 15px; border-bottom: 2px solid var(--secondary); color: var(--secondary);">
+                Edit Subcategory
+            </h2>
+        </div>
+        
+        <form id="dynamic-subcategory-edit-form" class="admin-form">
+            <input type="hidden" name="id" value="${subcategory.id}">
+            
+            <div class="form-row">
+                <label for="dynamicEditSubcategoryName">Subcategory Name *</label>
+                <input type="text" id="dynamicEditSubcategoryName" name="name" required 
+                       placeholder="Enter subcategory name" value="${subcategory.name || ''}">
+            </div>
+            
+            <div class="form-row">
+                <label for="dynamicEditSubcategorySlug">Slug (URL Friendly)</label>
+                <input type="text" id="dynamicEditSubcategorySlug" name="slug" maxlength="100" 
+                       placeholder="Will be generated automatically if empty" value="${subcategory.slug || ''}">
+                <small class="form-hint">Used in URLs, maximum 100 characters, lowercase letters, numbers and hyphens only</small>
+            </div>
+            
+            <div class="form-row">
+                <label for="dynamicEditSubcategoryDescription">Description</label>
+                <textarea id="dynamicEditSubcategoryDescription" name="description" rows="3" 
+                         placeholder="Describe the subcategory">${subcategory.description || ''}</textarea>
+            </div>
+            
+            <div class="form-row">
+                <label for="dynamicEditSubcategoryCategory">Parent Category *</label>
+                <select id="dynamicEditSubcategoryCategory" name="categoryId" required>
+                    <option value="">Select a category</option>
+                    ${categories.map(category => `
+                        <option value="${category.id}" ${category.id === subcategory.categoryId ? 'selected' : ''}>
+                            ${category.name}
+                        </option>
+                    `).join('')}
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="action-btn btn-secondary" onclick="hideEditSubcategoryForm()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="action-btn btn-primary">
+                    <i class="fas fa-save"></i> Update Subcategory
+                </button>
+            </div>
+        </form>
+    `;
+    
+    // Tambahkan ke DOM di awal parent container
+    parentContainer.insertBefore(formContainer, parentContainer.firstChild);
+    
+    // Tambahkan event listener untuk form
+    document.getElementById('dynamic-subcategory-edit-form').addEventListener('submit', handleDynamicEditSubcategoryForm);
+    
+    // Scroll ke form
+    formContainer.scrollIntoView({ behavior: 'smooth' });
+    
+    console.log('Edit subcategory form created and added to DOM');
+}
+
+// Fungsi untuk menyembunyikan form edit
+function hideEditSubcategoryForm() {
+    const formContainer = document.getElementById('dynamic-subcategory-edit-form-container');
+    if (formContainer) {
+        formContainer.style.display = 'none';
+    }
+    
+    const subcategoryListContainer = document.getElementById('subcategoryListContainer');
+    if (subcategoryListContainer) {
+        subcategoryListContainer.style.display = 'block';
+    }
+}
+
+// Fungsi untuk menangani submit form edit
+async function handleDynamicEditSubcategoryForm(event) {
+    event.preventDefault();
+    
+    try {
+        // Show loading state
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<div class="loading" style="width: 20px; height: 20px;"></div>';
+        submitBtn.disabled = true;
+        
+        // Get form data
+        const formData = new FormData(event.target);
+        const subcategoryId = formData.get('id');
+        
+        const subcategoryData = {
+            name: formData.get('name'),
+            slug: formData.get('slug') || '',
+            description: formData.get('description') || '',
+            categoryId: formData.get('categoryId')
+        };
+        
+        console.log('Updating subcategory data:', subcategoryId, subcategoryData);
+        
+        // Validate
+        if (!subcategoryData.name) {
+            throw new Error('Subcategory name is required');
+        }
+        
+        if (!subcategoryData.categoryId) {
+            throw new Error('Parent category is required');
+        }
+        
+        // Generate slug if empty
+        if (!subcategoryData.slug && subcategoryData.name) {
+            subcategoryData.slug = subcategoryData.name
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '')
+                .substring(0, 100);
+        }
+        
+        // Send request
+        const response = await fetch(`${API_BASE_URL}/categories/subcategories/${subcategoryId}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(subcategoryData)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update subcategory');
+        }
+        
+        // Show success message
+        showToast('Subcategory updated successfully', 'success');
+        
+        // Hide form
+        hideEditSubcategoryForm();
+        
+        // Reload subcategories
+        await loadAllSubcategories();
+        
+    } catch (error) {
+        console.error('Error updating subcategory:', error);
+        showToast('Error: ' + error.message, 'error');
+    } finally {
+        // Restore button
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+    }
+}
+
+// Ganti fungsi editSubcategory yang lama
+function editSubcategory(subcategoryId) {
+    createEditSubcategoryForm(subcategoryId);
+}
+
+// Fix to ensure table headers are visible
+function fixTableHeaders() {
+    const tableHeads = document.querySelectorAll('.admin-table thead');
+    tableHeads.forEach(thead => {
+        thead.style.display = 'table-header-group';
+        
+        const headers = thead.querySelectorAll('th');
+        headers.forEach(th => {
+            th.style.display = 'table-cell';
+            th.style.visibility = 'visible';
+            th.style.color = 'white';
+            th.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)';
+            th.style.padding = '15px';
+            th.style.fontWeight = '600';
+        });
+    });
+}
+
+// Call the fix after tables are loaded
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(fixTableHeaders, 500);
+    
+    // Also fix headers when switching tabs
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            setTimeout(fixTableHeaders, 300);
+        });
+    });
+});
+
+// Function to show registration form
+function showRegisterForm() {
+    // Get the profile page content area
+    const profileContent = document.getElementById('profilePage').querySelector('div[style="padding: 20px;"]');
+    
+    if (!profileContent) {
+        console.error('Profile content area not found');
+        return;
+    }
+    
+    // Replace content with registration form
+    profileContent.innerHTML = `
+        <div class="login-tabs">
+            <div class="login-tab" id="loginTab" onclick="showLoginForm()">Login</div>
+            <div class="login-tab active" id="registerTab">Register</div>
+        </div>
+        
+        <div id="registerForm" class="login-form active">
+            <form onsubmit="handleRegister(event)">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">Username</label>
+                    <input type="text" id="registerUsername" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">Email</label>
+                    <input type="email" id="registerEmail" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">Password</label>
+                    <input type="password" id="registerPassword" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                </div>
+                <button type="submit" class="action-btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+                <p style="text-align: center; margin-top: 15px; color: var(--text-secondary);">
+                    Already have an account? <a href="#" onclick="showLoginForm()" style="color: var(--primary);">Login</a>
+                </p>
+                <div id="registerError" style="color: var(--danger); margin-top: 15px; text-align: center; display: none;"></div>
+            </form>
+        </div>
+    `;
+}
+
+// Function to show login form (go back from registration)
+function showLoginForm() {
+    // Switch back to the login form
+    const profilePage = document.getElementById('profilePage');
+    
+    profilePage.innerHTML = `
+        <div class="listings-header">
+            <h2 class="listings-title">Your Profile</h2>
+            <p class="listings-subtitle">Login to your account</p>
+        </div>
+        <div style="padding: 20px;">
+            <div class="login-tabs">
+                <div class="login-tab active" id="userLoginTab" onclick="switchLoginTab('user')">User Login</div>
+                <div class="login-tab" id="adminLoginTab" onclick="switchLoginTab('admin')">Admin Login</div>
+            </div>
+            
+            <div id="userLoginForm" class="login-form active">
+                <form onsubmit="handleLogin(event)">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Username</label>
+                        <input type="text" id="adminUsername" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Password</label>
+                        <input type="password" id="adminPassword" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    </div>
+                    <button type="submit" class="action-btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <p style="text-align: center; margin-top: 15px; color: var(--text-secondary);">
+                        Don't have an account? <a href="#" onclick="showRegisterForm()" style="color: var(--primary);">Register</a>
+                    </p>
+                    <div id="userLoginError" style="color: var(--danger); margin-top: 15px; text-align: center; display: none;"></div>
+                </form>
+            </div>
+            
+            <div id="adminLoginForm" class="login-form">
+                <form onsubmit="handleAdminLogin(event)">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Admin Username</label>
+                        <input type="text" id="adminUsername2" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Admin Password</label>
+                        <input type="password" id="adminPassword2" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    </div>
+                    <button type="submit" class="action-btn btn-primary" style="width: 100%; background-color: #8b5cf6;">
+                        <i class="fas fa-lock"></i> Login as Admin
+                    </button>
+                    <div id="adminLoginError2" style="color: var(--danger); margin-top: 15px; text-align: center; display: none;"></div>
+                </form>
+            </div>
+        </div>
+    `;
+}
+
+// Handle registration form submission
+async function handleRegister(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('registerUsername').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const errorElement = document.getElementById('registerError');
+    
+    // Reset error
+    errorElement.style.display = 'none';
+    
+    // Simple validation
+    if (!username || !email || !password || !confirmPassword) {
+        errorElement.textContent = 'Please fill in all fields';
+        errorElement.style.display = 'block';
+        return;
+    }
+    
+    // Check if passwords match
+    if (password !== confirmPassword) {
+        errorElement.textContent = 'Passwords do not match';
+        errorElement.style.display = 'block';
+        return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        errorElement.textContent = 'Please enter a valid email address';
+        errorElement.style.display = 'block';
+        return;
+    }
+    
+    try {
+        // Show loading
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<div class="loading" style="width: 20px; height: 20px;"></div>';
+        submitBtn.disabled = true;
+        
+        // Send registration request
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username,
+                email,
+                password
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Registration failed');
+        }
+        
+        const data = await response.json();
+        
+        // Auto-login after successful registration
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Update UI for logged-in state
+        updateUserInterface(true, false);
+        
+        // Show success toast and redirect to home
+        showToast('Registration successful! Welcome to PAW Directory', 'success');
+        showPage('home');
+        
+    } catch (error) {
+        // Show error
+        errorElement.textContent = error.message || 'Registration failed';
+        errorElement.style.display = 'block';
+        console.error('Registration error:', error);
+    } finally {
+        // Restore button
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register';
+        submitBtn.disabled = false;
+    }
+}
 
 
 
