@@ -1952,9 +1952,18 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
             return defaultReturnValue;
         }
 
-    async function fetchCategories() {
+        async function fetchCategories() {
     try {
         debugLog('Fetching categories...');
+        
+        // Check if categories are in cache
+        const cachedCategories = apiCache.get('categories');
+        if (cachedCategories) {
+            categories = cachedCategories;
+            return categories;
+        }
+        
+        // If not in cache, fetch from API
         const response = await fetch(`${API_BASE_URL}/categories`);
         if (!response.ok) {
             throw new Error(`Failed to fetch categories: ${response.status} ${response.statusText}`);
@@ -1963,8 +1972,7 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
         let data = await response.json();
         debugLog('Raw categories data:', data);
         
-        // Jika data adalah array, gunakan langsung
-        // Jika data memiliki property 'data' yang berisi array, gunakan itu
+        // Process data as before
         if (data.data && Array.isArray(data.data)) {
             data = data.data;
         } else if (!Array.isArray(data)) {
@@ -1972,13 +1980,12 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
             return [];
         }
         
-        // Filter kategori yang tidak valid dan proses data
+        // Filter and process categories
         data = data.filter(cat => cat && cat.name && cat.name !== "string" && cat.name.trim() !== "").map(cat => {
-            // Pastikan subcategories ada dan dalam format yang diharapkan
+            // Process subcategories
             let subcategories = [];
             
             if (cat.subcategories) {
-                // Jika subcategories adalah string JSON, parse
                 if (typeof cat.subcategories === 'string') {
                     try {
                         subcategories = JSON.parse(cat.subcategories);
@@ -1986,14 +1993,12 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
                         debugLog('Error parsing subcategories string:', e);
                         subcategories = [];
                     }
-                } 
-                 // Jika subcategories sudah array, gunakan
-                 else if (Array.isArray(cat.subcategories)) {
+                } else if (Array.isArray(cat.subcategories)) {
                     subcategories = cat.subcategories;
                 }
             }
             
-            // Konversi subcategories ke format yang konsisten
+            // Format subcategories
             subcategories = subcategories.map(sub => {
                 if (typeof sub === 'string') {
                     return { id: sub, name: sub };
@@ -2010,17 +2015,21 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
                 id: cat.id || cat._id,
                 name: cat.name,
                 icon: cat.icon || '📁',
-                count: cat.businessCount|| 0,
+                count: cat.businessCount || 0,
                 subcategories: subcategories
             };
         });
         
         debugLog('Processed categories:', data);
         categories = data;
+        
+        // Store in cache for 5 minutes
+        apiCache.set('categories', categories);
+        
         return categories;
     } catch (error) {
         console.error('Error fetching categories:', error);
-        throw error; // Re-throw to let init() handle it
+        throw error;
     }
 }
 
@@ -2063,6 +2072,15 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
         // Fetch businesses by category
         async function fetchBusinessesByCategory(categoryId) {
             try {
+                // Check cache first
+                const cacheKey = `businesses_category_${categoryId}`;
+                const cachedData = apiCache.get(cacheKey);
+                if (cachedData) {
+                    filteredBusinesses = cachedData;
+                    return cachedData;
+                }
+                
+                // Not in cache, fetch from API
                 const response = await fetch(`${API_BASE_URL}/businesses?category=${categoryId}&limit=10&offset=0&sortBy=createdAt&sortOrder=DESC`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch businesses by category: ${response.status} ${response.statusText}`);
@@ -2070,8 +2088,11 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
                 
                 const data = await response.json();
                 
-                // Check if data is in expected format (might be wrapped in a data property)
+                // Process data
                 const businessesData = data.data ? data.data : data;
+                
+                // Store in cache - shorter TTL for business data (2 minutes)
+                apiCache.set(cacheKey, businessesData, 2 * 60 * 1000);
                 
                 filteredBusinesses = businessesData;
                 return businessesData;
@@ -2079,6 +2100,7 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
                 return handleApiError(error, []);
             }
         }
+
 
         // Fetch user favorites
         async function fetchUserFavorites() {
@@ -2801,6 +2823,15 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
         // Fetch businesses by subcategory
         async function fetchBusinessesBySubcategory(categoryId, subcategoryId) {
             try {
+                // Check cache first
+                const cacheKey = `businesses_subcategory_${categoryId}_${subcategoryId}`;
+                const cachedData = apiCache.get(cacheKey);
+                if (cachedData) {
+                    filteredBusinesses = cachedData;
+                    return cachedData;
+                }
+                
+                // Not in cache, fetch from API
                 const response = await fetch(`${API_BASE_URL}/businesses?category=${categoryId}&subcategory=${subcategoryId}&limit=10&offset=0&sortBy=createdAt&sortOrder=DESC`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch businesses by subcategory: ${response.status} ${response.statusText}`);
@@ -2808,8 +2839,11 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
                 
                 const data = await response.json();
                 
-                // Check if data is in expected format
+                // Process data
                 const businessesData = data.data ? data.data : data;
+                
+                // Store in cache - shorter TTL for business data (2 minutes)
+                apiCache.set(cacheKey, businessesData, 2 * 60 * 1000);
                 
                 filteredBusinesses = businessesData;
                 return businessesData;
@@ -5060,6 +5094,8 @@ function renderSearchResultsPage(searchResults, query) {
             
             const responseData = await response.json();
             console.log('Response data:', responseData);
+
+            invalidateBusinessCache();
             
             // Show success message
             showToast(isEditMode ? 'Business updated successfully' : 'Business created successfully', 'success');
@@ -6075,6 +6111,73 @@ async function checkFavoriteStatus(businessIds) {
         return {};
     }
 }
+
+
+// Add cache system for API calls
+const apiCache = {
+    data: {}, // Cache storage
+    timeouts: {}, // Timeout references for cache expiration
+    
+    // Default TTL (time to live) in milliseconds (5 minutes)
+    defaultTTL: 5 * 60 * 1000,
+    
+    // Set data in cache with optional TTL
+    set(key, data, ttl = this.defaultTTL) {
+        console.log(`[Cache] Setting data for key: ${key}`);
+        this.data[key] = {
+            data: data,
+            timestamp: Date.now()
+        };
+        
+        // Clear any existing timeout
+        if (this.timeouts[key]) {
+            clearTimeout(this.timeouts[key]);
+        }
+        
+        // Set timeout to clear this cache entry
+        this.timeouts[key] = setTimeout(() => {
+            console.log(`[Cache] Expiring cache for key: ${key}`);
+            this.clear(key);
+        }, ttl);
+    },
+    
+    // Get data from cache if it exists and is not expired
+    get(key) {
+        const cacheEntry = this.data[key];
+        if (cacheEntry) {
+            console.log(`[Cache] Cache hit for key: ${key}`);
+            return cacheEntry.data;
+        }
+        console.log(`[Cache] Cache miss for key: ${key}`);
+        return null;
+    },
+    
+    // Check if key exists in cache
+    has(key) {
+        return !!this.data[key];
+    },
+    
+    // Clear specific cache entry
+    clear(key) {
+        delete this.data[key];
+        if (this.timeouts[key]) {
+            clearTimeout(this.timeouts[key]);
+            delete this.timeouts[key];
+        }
+    },
+    
+    // Clear all cache
+    clearAll() {
+        this.data = {};
+        for (const key in this.timeouts) {
+            clearTimeout(this.timeouts[key]);
+        }
+        this.timeouts = {};
+        console.log('[Cache] Cache cleared');
+    }
+};
+
+
 // Variables for subcategory pagination
 let allSubcategories = [];
 let filteredSubcategories = [];
@@ -6478,6 +6581,7 @@ function hideAddSubcategoryForm() {
 }
 
 // Event handler for add subcategory form
+// Event handler for add subcategory form
 async function handleAddSubcategoryForm(event) {
     event.preventDefault();
     
@@ -6529,6 +6633,10 @@ async function handleAddSubcategoryForm(event) {
             const errorData = await response.json();
             throw new Error(errorData.message || 'Failed to create subcategory');
         }
+        
+        // Invalidate relevant cache after successful operation
+        apiCache.clear('categories');
+        invalidateBusinessCache();
         
         // Show success message
         showToast('Subcategory created successfully', 'success');
@@ -7141,6 +7249,23 @@ async function handleDynamicEditSubcategoryForm(event) {
 // Ganti fungsi editSubcategory yang lama
 function editSubcategory(subcategoryId) {
     createEditSubcategoryForm(subcategoryId);
+}
+
+// Add a function to invalidate cache when needed (e.g., after admin actions)
+function invalidateBusinessCache() {
+    // Clear all business-related cache entries
+    for (const key in apiCache.data) {
+        if (key.startsWith('businesses_')) {
+            apiCache.clear(key);
+        }
+    }
+    console.log('Business cache invalidated');
+}
+
+// Add function to clear all cache
+function clearAllCache() {
+    apiCache.clearAll();
+    showToast('Cache cleared', 'success');
 }
 
 // Fix to ensure table headers are visible
