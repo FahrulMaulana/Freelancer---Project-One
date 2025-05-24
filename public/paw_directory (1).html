@@ -611,10 +611,11 @@
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 0;
+            right: 0;
             width: 100%;
-            max-width: 430px;
+            max-width: 430px; /* Match app-container max-width */
+            margin: 0 auto; /* Center the navigation */
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-top: 1px solid var(--border);
@@ -859,6 +860,10 @@
         @media (min-width: 768px) {
             .app-container {
                 max-width: 500px;
+            }
+
+            .bottom-nav {
+                max-width: 500px; /* Match app-container max-width at larger screens */
             }
             
             .categories-grid {
