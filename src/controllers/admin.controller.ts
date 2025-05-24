@@ -6,7 +6,6 @@ import { AdminService } from 'src/services/admin.service'
 
 @ApiTags('Admin')
 @Controller('admin')
-@UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
@@ -16,6 +15,7 @@ export class AdminController {
   }
 
   @Get('health')
+  @UseGuards(JwtAuthGuard, AdminGuard)
   getSystemHealth() {
     return this.adminService.getSystemHealth()
   }
