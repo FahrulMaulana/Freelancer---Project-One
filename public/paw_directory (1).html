@@ -2718,86 +2718,6 @@ let currentSearchQuery = null; // Untuk menyimpan query pencarian aktif
 
             const user = JSON.parse(localStorage.getItem('adminUser')) || {};
             const isAdmin = user.role === 'admin';
-            
-            // if (isAdmin) {                
-            //     // Admin melihat stats yang lebih lengkap
-            //     const totalBusinesses = stats?.totalBusinesses || businesses?.length || 0;
-            //     const activeBusinesses = stats?.activeBusinesses || totalBusinesses || 0;
-            //     const featuredBusinesses = stats?.featuredBusinesses || 0;
-            //     const totalCategories = stats?.totalCategories || categories?.length || 0;
-            //     const totalSubcategories = stats?.totalSubcategories || 0;
-            //     const totalUsers = stats?.totalUsers || 0;
-            //     const totalAdmins = stats?.totalAdmins || 1;
-                
-            //     // Update CSS untuk grid layout yang lebih besar
-            //     statsGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-                
-            //     // Update stats grid dengan nilai yang valid dan lebih banyak data
-            //     statsGrid.innerHTML = `
-            //       <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
-            //         <div class="stat-number">${totalBusinesses}</div>
-            //         <div class="stat-label">Total Businesses</div>
-            //     </div>
-            //     <div class="stat-card" data-aos="fade-up" data-aos-delay="150">
-            //         <div class="stat-number">${activeBusinesses}</div>
-            //         <div class="stat-label">Active Businesses</div>
-            //     </div>
-            //     <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
-            //         <div class="stat-number">${featuredBusinesses}</div>
-            //         <div class="stat-label">Featured</div>
-            //     </div>
-            //     <div class="stat-card" data-aos="fade-up" data-aos-delay="250">
-            //         <div class="stat-number">${totalCategories}</div>
-            //         <div class="stat-label">Categories</div>
-            //     </div>
-            //     <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
-            //         <div class="stat-number">${totalSubcategories}</div>
-            //         <div class="stat-label">Subcategories</div>
-            //     </div>
-            //     <div class="stat-card" data-aos="fade-up" data-aos-delay="350">
-            //         <div class="stat-number">${totalUsers}</div>
-            //         <div class="stat-label">Users</div>
-            //     </div>
-            //     <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
-            //         <div class="stat-number">${totalAdmins}</div>
-            //         <div class="stat-label">Admins</div>
-            //     </div>
-            //     <div class="stat-card manage-card" data-aos="fade-up" data-aos-delay="450" onclick="showAdminPanel('businesses')">
-            //         <div class="stat-icon"><i class="fas fa-cog"></i></div>
-            //         <div class="stat-label">Manage Data</div>
-            //     </div>
-            // `;
-
-            // const styleElement = document.createElement('style');
-            // styleElement.textContent = `
-            //     .stat-card.manage-card {
-            //         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            //         color: white;
-            //         cursor: pointer;
-            //         transition: all 0.3s ease;
-            //     }
-                
-            //     .stat-card.manage-card:hover {
-            //         transform: translateY(-8px) scale(1.05);
-            //         box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
-            //     }
-                
-            //     .stat-icon {
-            //         font-size: 24px;
-            //         margin-bottom: 8px;
-            //     }
-                
-            //     .stat-card.manage-card .stat-label {
-            //         color: white;
-            //         font-weight: 600;
-            //     }
-            // `;
-            // document.head.appendChild(styleElement);
-            
-            // } else {
-
-            // }
-            // Pastikan stats memiliki data yang valid
             const businessCount = stats?.businessCount || businesses?.length || 0;
             const categoryCount = stats?.categoryCount || categories?.length || 0;
             const averageRating = stats?.averageRating || 4.5;
@@ -4653,37 +4573,41 @@ function renderSearchResultsPage(searchResults, query) {
         document.head.appendChild(adminModalStyle);
 
 
-        // Open admin modal
-        function openAdminModal() {
-        // Reset admin UI
-        adminCurrentTab = 'add-listing';
-        
-        // Populate categories dropdown
-        populateCategoriesDropdown();
-        
-        // Show admin modal
-        const adminModal = document.getElementById('adminModal');
-        adminModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-        
-        // Efek fade in untuk modal
-        setTimeout(() => {
-            adminModal.querySelector('.modal-content').style.transform = 'translateY(0)';
-            adminModal.querySelector('.modal-content').style.opacity = '1';
-        }, 10);
-        
-        // Set active tab
-        document.querySelectorAll('.admin-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.getAttribute('data-tab') === adminCurrentTab);
-        });
-        
-        document.querySelectorAll('.admin-tab-content').forEach(content => {
-            content.classList.toggle('active', content.id === `${adminCurrentTab}-content`);
-        });
-        
-        // Load admin data based on current tab
-        loadAdminTabContent(adminCurrentTab);
-    }
+        // Enhanced openAdminModal function - USE THIS INSTEAD
+function openAdminModal() {
+    // Reset admin UI
+    adminCurrentTab = 'add-listing';
+    
+    // Populate categories dropdown
+    populateCategoriesDropdown();
+    
+    // Show admin modal
+    const adminModal = document.getElementById('adminModal');
+    adminModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    
+    // Efek fade in untuk modal
+    setTimeout(() => {
+        adminModal.querySelector('.modal-content').style.transform = 'translateY(0)';
+        adminModal.querySelector('.modal-content').style.opacity = '1';
+    }, 10);
+    
+    // Set active tab
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.getAttribute('data-tab') === adminCurrentTab);
+    });
+    
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.classList.toggle('active', content.id === `${adminCurrentTab}-content`);
+    });
+    
+    // Load admin data based on current tab
+    loadAdminTabContent(adminCurrentTab);
+    
+    // Add the enhanced functionality
+    enhanceAddListingForm();
+    enhanceFormWithCancelButton();
+}
 
         // Close admin modal
         function closeAdminModal() {
@@ -4726,81 +4650,87 @@ function renderSearchResultsPage(searchResults, query) {
 
         // Load businesses for admin
         async function loadBusinessesForAdmin() {
-            try {
-                const adminBusinessList = document.getElementById('adminBusinessList');
-                adminBusinessList.innerHTML = `
-                    <tr>
-                        <td colspan="3" style="text-align: center; padding: 20px;">
-                            <div class="loading" style="display: inline-block;"></div>
-                            <p style="margin-top: 10px;">Loading businesses...</p>
-                        </td>
-                    </tr>
-                `;
-                
-                // Try using the regular businesses endpoint instead of admin-specific
-                const response = await fetch(`${API_BASE_URL}/businesses?limit=${adminPageSize}&offset=${(adminPageNumber-1)*adminPageSize}&sortBy=createdAt&sortOrder=DESC`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    console.error(`API Error: ${response.status} ${response.statusText}`);
-                    const errorText = await response.text();
-                    console.error(`Response body: ${errorText}`);
-                    throw new Error(`Failed to load businesses: ${response.status} ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                
-                // Update pagination
-                adminTotalPages = Math.ceil(data.total / adminPageSize);
-                document.getElementById('currentPage').textContent = `Page ${adminPageNumber} of ${adminTotalPages}`;
-                
-                if (!data.data || data.data.length === 0) {
-                    adminBusinessList.innerHTML = `
-                        <tr>
-                            <td colspan="3" style="text-align: center; padding: 20px;">
-                                No businesses found
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                // Render businesses
-                adminBusinessList.innerHTML = data.data.map(business => {
-                    // Find category
-                    const category = categories.find(c => c.id === business.categoryId);
-                    const categoryName = category ? category.name : 'General';
-                    
-                    return `
-                        <tr>
-                            <td>${business.name}</td>
-                            <td>${categoryName}</td>
-                            <td>
-                                <button class="admin-action-btn btn-edit" onclick="editBusiness('${business.id}')">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="admin-action-btn btn-delete" onclick="deleteBusiness('${business.id}')">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-                
-            } catch (error) {
-                console.error('Error loading businesses for admin:', error);
-                document.getElementById('adminBusinessList').innerHTML = `
-                    <tr>
-                        <td colspan="3" style="text-align: center; padding: 20px; color: var(--danger);">
-                            Error loading businesses: ${error.message}
-                        </td>
-                    </tr>
-                `;
+    try {
+        const adminBusinessList = document.getElementById('adminBusinessList');
+        adminBusinessList.innerHTML = `
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 20px;">
+                    <div class="loading" style="display: inline-block;"></div>
+                    <p style="margin-top: 10px;">Loading businesses...</p>
+                </td>
+            </tr>
+        `;
+        
+        // Try using the regular businesses endpoint
+        const response = await fetch(`${API_BASE_URL}/businesses?limit=${adminPageSize}&offset=${(adminPageNumber-1)*adminPageSize}&sortBy=createdAt&sortOrder=DESC`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
+        });
+        
+        if (!response.ok) {
+            console.error(`API Error: ${response.status} ${response.statusText}`);
+            const errorText = await response.text();
+            console.error(`Response body: ${errorText}`);
+            throw new Error(`Failed to load businesses: ${response.status} ${response.statusText}`);
         }
+        
+        const data = await response.json();
+        
+        // Update pagination
+        adminTotalPages = Math.ceil(data.total / adminPageSize);
+        document.getElementById('currentPage').textContent = `Page ${adminPageNumber} of ${adminTotalPages}`;
+        
+        if (!data.data || data.data.length === 0) {
+            adminBusinessList.innerHTML = `
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 20px;">
+                        No businesses found
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        // Render businesses - FIX: Use single quotes for ID values and properly escape them
+        adminBusinessList.innerHTML = data.data.map(business => {
+            // Find category
+            const category = categories.find(c => c.id === business.categoryId);
+            const categoryName = category ? category.name : 'General';
+            
+            // Ensure business ID exists and escape it properly for the HTML attributes
+            const safeBusinessId = business.id ? business.id.replace(/'/g, '\\\'') : '';
+            
+            // Debug log
+            console.log(`Rendering business: ${business.name}, ID: ${safeBusinessId}`);
+            
+            return `
+                <tr data-business-id="${safeBusinessId}">
+                    <td>${business.name}</td>
+                    <td>${categoryName}</td>
+                    <td>
+                        <button class="admin-action-btn btn-edit" onclick="editBusiness('${safeBusinessId}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="admin-action-btn btn-delete" onclick="deleteBusiness('${safeBusinessId}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('Error loading businesses for admin:', error);
+        document.getElementById('adminBusinessList').innerHTML = `
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 20px; color: var(--danger);">
+                    Error loading businesses: ${error.message}
+                </td>
+            </tr>
+        `;
+    }
+}
 
         // Load categories for admin
         async function loadCategoriesForAdmin() {
@@ -4994,140 +4924,164 @@ function renderSearchResultsPage(searchResults, query) {
     }
 
   
-    // Add event listener for adding/updating business
-        document.getElementById('addListingForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
+    
+    // Update the form submission handler to properly handle edit mode
+document.getElementById('addListingForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    try {
+        // Show loading state
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<div class="loading" style="width: 20px; height: 20px;"></div>';
+        submitBtn.disabled = true;
         
-        try {
-            // Show loading state
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<div class="loading" style="width: 20px; height: 20px;"></div>';
-            submitBtn.disabled = true;
+        // Check if we're in edit mode
+        const isEditMode = event.target.getAttribute('data-edit-mode') === 'true';
+        const businessId = event.target.getAttribute('data-business-id');
+        
+        console.log('Form submission - Edit mode:', isEditMode, 'Business ID:', businessId);
+        
+        // Convert form data to JSON
+        const formElements = event.target.elements;
+        const jsonData = {};
+        
+        // Get uploaded filenames
+        const uploadedFilenamesInput = document.getElementById('uploadedFilenames');
+        const uploadedFilenames = uploadedFilenamesInput && uploadedFilenamesInput.value ? 
+            JSON.parse(uploadedFilenamesInput.value) : [];
+        
+        // Add uploaded filenames to images array if any
+        if (uploadedFilenames.length > 0) {
+            jsonData.images = uploadedFilenames;
+        }
+        
+        // Collect all fields except for file inputs and our custom uploadedFilenames
+        for (let i = 0; i < formElements.length; i++) {
+            const element = formElements[i];
             
-            // Konversi form data langsung ke JSON
-            const formElements = event.target.elements;
-            const jsonData = {};
-            
-            // Ambil semua field kecuali upload gambar
-            for (let i = 0; i < formElements.length; i++) {
-                const element = formElements[i];
+            if (element.type !== 'button' && 
+                element.type !== 'submit' && 
+                element.type !== 'file' && 
+                element.name && 
+                element.name !== 'uploadedFilenames') {
                 
-                // Skip buttons dan file inputs
-                if (element.type !== 'button' && 
-                    element.type !== 'submit' && 
-                    element.type !== 'file' && 
-                    element.name) {
-                    
-                    // Handle checkbox
-                    if (element.type === 'checkbox') {
-                        jsonData[element.name] = element.checked;
-                    } 
-                    // Handle radio buttons
-                    else if (element.type === 'radio') {
-                        if (element.checked) {
-                            jsonData[element.name] = element.value;
-                        }
-                    } 
-                    // Handle other field types
-                    else if (element.value.trim() !== '') {
+                if (element.type === 'checkbox') {
+                    jsonData[element.name] = element.checked;
+                } 
+                else if (element.type === 'radio') {
+                    if (element.checked) {
                         jsonData[element.name] = element.value;
                     }
+                } 
+                else if (element.value.trim() !== '') {
+                    jsonData[element.name] = element.value;
                 }
             }
-            
-            // Format data khusus
-            if (jsonData.keywords) {
-                jsonData.keywords = jsonData.keywords.split(',')
-                    .map(keyword => keyword.trim())
-                    .filter(keyword => keyword.length > 0);
-            }
-            
-            // Handle business hours
-            if (jsonData.openTime && jsonData.closeTime) {
-                jsonData.businessHours = {
-                    open: jsonData.openTime,
-                    close: jsonData.closeTime
-                };
-                delete jsonData.openTime;
-                delete jsonData.closeTime;
-            }
-            
-            // Convert numeric fields
-            if (jsonData.latitude) jsonData.latitude = parseFloat(jsonData.latitude);
-            if (jsonData.longitude) jsonData.longitude = parseFloat(jsonData.longitude);
-            
-            // Cek apakah form dalam mode edit
-            const isEditMode = event.target.getAttribute('data-edit-mode') === 'true';
-            const businessId = event.target.getAttribute('data-business-id');
-            
-            let response;
-            
-            console.log('Sending JSON data:', jsonData);
-            
-            if (isEditMode && businessId) {
-                // Mode update - menggunakan PATCH dengan JSON
-                response = await fetch(`${API_BASE_URL}/businesses/${businessId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                });
-            } else {
-                // Mode add - menggunakan POST dengan JSON
-                response = await fetch(`${API_BASE_URL}/businesses`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                });
-            }
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to save business');
-            }
-            
-            const responseData = await response.json();
-            console.log('Response data:', responseData);
-
-            invalidateBusinessCache();
-            
-            // Show success message
-            showToast(isEditMode ? 'Business updated successfully' : 'Business created successfully', 'success');
-            
-            // Reset form
-            event.target.reset();
-            
-            // Reset edit mode
-            event.target.removeAttribute('data-edit-mode');
-            event.target.removeAttribute('data-business-id');
-            
-            // Change button text back
-            submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Business';
-            
-            // Close modal and refresh listings
-            closeAdminModal();
-            if (currentPage === 'listings') {
-                renderListings();
-            } else {
-                fetchBusinesses();
-            }
-            
-        } catch (error) {
-            console.error('Error saving business:', error);
-            showToast('Error: ' + error.message, 'error');
-        } finally {
-            // Restore button
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Business';
-            submitBtn.disabled = false;
         }
-    });
+        
+        // Format special fields
+        if (jsonData.keywords) {
+            jsonData.keywords = jsonData.keywords.split(',')
+                .map(keyword => keyword.trim())
+                .filter(keyword => keyword.length > 0);
+        }
+        
+        // Handle business hours
+        if (jsonData.openTime && jsonData.closeTime) {
+            jsonData.businessHours = {
+                open: jsonData.openTime,
+                close: jsonData.closeTime
+            };
+            delete jsonData.openTime;
+            delete jsonData.closeTime;
+        }
+        
+        // Convert numeric fields
+        if (jsonData.latitude) jsonData.latitude = parseFloat(jsonData.latitude);
+        if (jsonData.longitude) jsonData.longitude = parseFloat(jsonData.longitude);
+        
+        let response;
+        
+        console.log('Sending JSON data:', jsonData);
+        console.log('Request method:', isEditMode ? 'PATCH' : 'POST');
+        console.log('Request URL:', isEditMode ? `${API_BASE_URL}/businesses/${businessId}` : `${API_BASE_URL}/businesses`);
+        
+        if (isEditMode && businessId) {
+            // Update existing business
+            response = await fetch(`${API_BASE_URL}/businesses/${businessId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            });
+        } else {
+            // Create new business
+            response = await fetch(`${API_BASE_URL}/businesses`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            });
+        }
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to save business');
+        }
+        
+        const responseData = await response.json();
+        console.log('Response data:', responseData);
+        
+        invalidateBusinessCache();
+        
+        // Show success message
+        showToast(isEditMode ? 'Business updated successfully' : 'Business created successfully', 'success');
+        
+        // Reset form
+        event.target.reset();
+
+        // Reset images section completely
+        resetImageUploadSection();
+
+        // Reset uploaded images and help message
+        const uploadedImagesContainer = document.getElementById('uploadedImagesContainer');
+        if (uploadedImagesContainer) uploadedImagesContainer.innerHTML = '';
+        
+        if (uploadedFilenamesInput) uploadedFilenamesInput.value = '';
+        
+        const helpMessage = document.querySelector('.uploaded-images-container .help-message');
+        if (helpMessage) helpMessage.remove();
+        
+        // Reset edit mode - IMPORTANT for preventing future form submissions from using edit mode
+        event.target.removeAttribute('data-edit-mode');
+        event.target.removeAttribute('data-business-id');
+        
+        // Change button text back
+        submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Business';
+        
+        // Close modal and refresh listings
+        closeAdminModal();
+        if (currentPage === 'listings') {
+            renderListings();
+        } else {
+            fetchBusinesses();
+        }
+        
+    } catch (error) {
+        console.error('Error saving business:', error);
+        showToast('Error: ' + error.message, 'error');
+    } finally {
+        // Restore button
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Business';
+        submitBtn.disabled = false;
+    }
+});
         // Add event listener for adding new category
         document.getElementById('addCategoryForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -5240,37 +5194,47 @@ function renderSearchResultsPage(searchResults, query) {
 
         // Delete business (admin)
         async function deleteBusiness(businessId) {
-            if (!confirm('Are you sure you want to delete this business?')) {
-                return;
+    console.log('Delete business called with ID:', businessId);
+    
+    if (!businessId) {
+        showToast('Error: Invalid business ID', 'error');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to delete this business?')) {
+        return;
+    }
+    
+    try {
+        // Show loading state
+        showToast('Deleting business...', 'info');
+        
+        const response = await fetch(`${API_BASE_URL}/businesses/${businessId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/admin/businesses/${businessId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to delete business');
-                }
-                
-                showToast('Business deleted successfully', 'success');
-                
-                // Refresh the list
-                loadBusinessesForAdmin();
-                
-                // Refresh main business list if we're on listings page
-                if (currentPage === 'listings') {
-                    renderListings();
-                }
-                
-            } catch (error) {
-                console.error('Error deleting business:', error);
-                showToast('Error: ' + error.message, 'error');
-            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete business');
         }
+        
+        showToast('Business deleted successfully', 'success');
+        
+        // Refresh the list
+        loadBusinessesForAdmin();
+        
+        // Refresh main business list if we're on listings page
+        if (currentPage === 'listings') {
+            renderListings();
+        }
+        
+    } catch (error) {
+        console.error('Error deleting business:', error);
+        showToast('Error: ' + error.message, 'error');
+    }
+}
 
         // Delete category (admin)
         async function deleteCategory(categoryId) {
@@ -5343,200 +5307,142 @@ function renderSearchResultsPage(searchResults, query) {
 
         // Edit business (admin)
         async function editBusiness(businessId) {
-            try {
-                // Fetch business details
-                const business = await fetchBusinessDetail(businessId);
-                
-                if (!business) {
-                    throw new Error('Business not found');
-                }
-                
-                // Switch to Add Listing tab (we'll reuse it for editing)
-                document.querySelectorAll('.admin-tab').forEach(tab => {
-                    tab.classList.toggle('active', tab.getAttribute('data-tab') === 'add-listing');
-                });
-                
-                document.querySelectorAll('.admin-tab-content').forEach(content => {
-                    content.classList.toggle('active', content.id === 'add-listing-content');
-                });
-                
-                // Populate form
-                document.getElementById('businessName').value = business.name || '';
-                document.getElementById('businessCategory').value = business.categoryId || '';
-                
-                // Load subcategories and select the right one
-                loadSubcategories();
-                setTimeout(() => {
-                    document.getElementById('businessSubcategory').value = business.subcategoryId || '';
-                }, 100);
-                
-                document.getElementById('businessDescription').value = business.description || '';
-                document.getElementById('businessPhone').value = business.phone || '';
-                document.getElementById('businessAddress').value = business.address || '';
-                document.getElementById('businessLatitude').value = business.latitude || '';
-                document.getElementById('businessLongitude').value = business.longitude || '';
-                document.getElementById('businessWebsite').value = business.website || '';
-                document.getElementById('businessEmail').value = business.email || '';
-                
-                // Handle keywords
-                if (business.keywords && Array.isArray(business.keywords)) {
-                    document.getElementById('businessKeywords').value = business.keywords.join(', ');
-                }
-                
-                // Handle business hours
-                if (business.businessHours) {
-                    if (business.businessHours.open) {
-                        document.getElementById('businessOpenTime').value = business.businessHours.open;
-                    }
-                    if (business.businessHours.close) {
-                        document.getElementById('businessCloseTime').value = business.businessHours.close;
-                    }
-                }
-                
-                // Handle featured
-                if (document.getElementById('businessFeatured')) {
-                    document.getElementById('businessFeatured').checked = business.featured || false;
-                }
-                
-                // REMOVED: Image preview handling
-                
-                // Set form to edit mode
-                const form = document.getElementById('addListingForm');
-                form.setAttribute('data-edit-mode', 'true');
-                form.setAttribute('data-business-id', businessId);
-                
-                // Change button text
-                const submitBtn = form.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Business';
-                
-                // Open modal
-                openAdminModal();
-                
-            } catch (error) {
-                console.error('Error editing business:', error);
-                showToast('Error: ' + error.message, 'error');
-            }
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        // Update business (admin)
-        async function updateBusiness(businessId, event) {
-        try {
-            // Show loading
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<div class="loading"></div>';
-            submitBtn.disabled = true;
-            
-            // 1. Ekstrak data teks (bukan file) dari form
-            const form = event.target;
-            const formData = new FormData(form);
-            const jsonData = {};
-            
-            // Convert form data to JSON object, excluding file inputs
-            for (let [key, value] of formData.entries()) {
-                // Skip file inputs
-                if (key !== 'images' && key !== 'image') {
-                    jsonData[key] = value;
-                }
-            }
-
-            if (uploadedImages.length > 0) {
-                try {
-                    const base64Image = await fileToBase64(uploadedImages[0]);
-                    jsonData.imageBase64 = base64Image;
-                } catch (e) {
-                    console.error('Error converting image to base64:', e);
-                }
-            }
-            
-            // Format data spesifik
-            if (jsonData.keywords) {
-                jsonData.keywords = jsonData.keywords.split(',')
-                    .map(k => k.trim())
-                    .filter(k => k.length > 0);
-            }
-            
-            if (jsonData.openTime && jsonData.closeTime) {
-                jsonData.businessHours = {
-                    open: jsonData.openTime,
-                    close: jsonData.closeTime
-                };
-                delete jsonData.openTime;
-                delete jsonData.closeTime;
-            }
-            
-            console.log('Sending JSON data:', jsonData);
-            
-            // 2. Update metadata dengan JSON
-            const response = await fetch(`${API_BASE_URL}/businesses/${businessId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jsonData)
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to update business');
-            }
-            
-            // 3. Jika ada file yang diupload, upload secara terpisah
-            if (uploadedImages && uploadedImages.length > 0) {
-                const imageFormData = new FormData();
-                uploadedImages.forEach(file => {
-                    imageFormData.append('images', file);
-                });
-                
-                const imageResponse = await fetch(`${API_BASE_URL}/businesses/${businessId}/images`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-                    },
-                    body: imageFormData
-                });
-                
-                if (!imageResponse.ok) {
-                    console.warn('Image upload failed, but business data was updated');
-                }
-            }
-            
-            // Show success message
-            showToast('Business updated successfully', 'success');
-            
-            // Reset form and close modal
-            form.reset();
-            document.getElementById('imagePreview').innerHTML = '';
-            uploadedImages = [];
-            closeAdminModal();
-            
-            // Refresh data
-            if (currentPage === 'listings') {
-                renderListings();
-            } else {
-                fetchBusinesses();
-            }
-            
-        } catch (error) {
-            console.error('Error updating business:', error);
-            showToast('Error: ' + error.message, 'error');
-        } finally {
-            // Restore button
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Business';
-            submitBtn.disabled = false;
-        }
+    console.log('Edit business called with ID:', businessId);
+    
+    if (!businessId) {
+        showToast('Error: Invalid business ID', 'error');
+        return;
     }
-
+    
+    try {
+        // Fetch business details
+        const business = await fetchBusinessDetail(businessId);
+        
+        if (!business) {
+            throw new Error('Business not found');
+        }
+        
+        console.log('Successfully fetched business details:', business);
+        
+        // Switch to Add Listing tab (we'll reuse it for editing)
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.getAttribute('data-tab') === 'add-listing');
+        });
+        
+        document.querySelectorAll('.admin-tab-content').forEach(content => {
+            content.classList.toggle('active', content.id === 'add-listing-content');
+        });
+        
+        // Get the form and explicitly set edit mode attributes
+        const form = document.getElementById('addListingForm');
+        form.setAttribute('data-edit-mode', 'true');
+        form.setAttribute('data-business-id', businessId);
+        
+        console.log('Set form attributes:', {
+            'data-edit-mode': form.getAttribute('data-edit-mode'),
+            'data-business-id': form.getAttribute('data-business-id')
+        });
+        
+        // Populate form fields
+        document.getElementById('businessName').value = business.name || '';
+        document.getElementById('businessCategory').value = business.categoryId || '';
+        
+        // Load subcategories and select the right one
+        loadSubcategories();
+        setTimeout(() => {
+            document.getElementById('businessSubcategory').value = business.subcategoryId || '';
+        }, 100);
+        
+        document.getElementById('businessDescription').value = business.description || '';
+        document.getElementById('businessPhone').value = business.phone || '';
+        document.getElementById('businessAddress').value = business.address || '';
+        document.getElementById('businessLatitude').value = business.latitude || '';
+        document.getElementById('businessLongitude').value = business.longitude || '';
+        document.getElementById('businessWebsite').value = business.website || '';
+        document.getElementById('businessEmail').value = business.email || '';
+        
+        // Handle keywords
+        if (business.keywords && Array.isArray(business.keywords)) {
+            document.getElementById('businessKeywords').value = business.keywords.join(', ');
+        }
+        
+        // Handle business hours
+        if (business.businessHours) {
+            if (business.businessHours.open) {
+                document.getElementById('businessOpenTime').value = business.businessHours.open;
+            }
+            if (business.businessHours.close) {
+                document.getElementById('businessCloseTime').value = business.businessHours.close;
+            }
+        }
+        
+        // Handle featured
+        const featuredCheckbox = document.getElementById('businessFeatured');
+        if (featuredCheckbox) {
+            featuredCheckbox.checked = business.featured || false;
+        }
+        
+        // Reset image upload section
+        resetImageUploadSection();
+        
+        // Handle images if any
+        if (business.images && business.images.length > 0) {
+            const uploadedFilenamesInput = document.getElementById('uploadedFilenames');
+            const uploadedImagesContainer = document.getElementById('uploadedImagesContainer');
+            
+            if (uploadedFilenamesInput && uploadedImagesContainer) {
+                // Set the filenames in the hidden input
+                const filenames = business.images.map(img => {
+                    // Extract filename from URL if needed
+                    return img.includes('/') ? img.split('/').pop() : img;
+                });
+                uploadedFilenamesInput.value = JSON.stringify(filenames);
+                
+                // Display existing images
+                business.images.forEach(imageUrl => {
+                    const fileId = 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    const filename = imageUrl.includes('/') ? imageUrl.split('/').pop() : imageUrl;
+                    
+                    const fileElement = document.createElement('div');
+                    fileElement.className = 'uploaded-file';
+                    fileElement.id = fileId;
+                    fileElement.dataset.filename = filename;
+                    fileElement.innerHTML = `
+                        <div class="current-image-item">
+                            <img src="${imageUrl}" alt="Uploaded image">
+                            <button type="button" class="remove-image-btn" onclick="removeUploadedFile('${fileId}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Add to container
+                    uploadedImagesContainer.appendChild(fileElement);
+                });
+                
+                // Add help message
+                const helpMessage = document.createElement('p');
+                helpMessage.className = 'help-message';
+                helpMessage.style.marginTop = '10px';
+                helpMessage.style.fontSize = '14px';
+                helpMessage.style.color = 'var(--text-secondary)';
+                helpMessage.innerHTML = '<i class="fas fa-info-circle"></i> Existing images will be preserved unless removed. New uploads will be added.';
+                uploadedImagesContainer.parentNode.appendChild(helpMessage);
+            }
+        }
+        
+        // Change button text
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Business';
+        
+        // Open modal
+        openAdminModal();
+        
+    } catch (error) {
+        console.error('Error editing business:', error);
+        showToast('Error: ' + error.message, 'error');
+    }
+}
         // Remove existing image
         async function removeExistingImage(businessId, imageUrl) {
             try {
@@ -7510,15 +7416,579 @@ async function handleRegister(event) {
         submitBtn.disabled = false;
     }
 }
-
-
-
+async function uploadImageToServer(file) {
+    try {
+        // Create form data for the file
+        const formData = new FormData();
+        formData.append('file', file);
         
+        // Upload to the special upload endpoint
+        const response = await fetch(`${API_BASE_URL}/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            },
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Upload failed: ${response.status}`);
+        }
+        
+        // Get the response which contains id and filename
+        const result = await response.json();
+        console.log('Upload result:', result);
+        
+        // Return the filename to be stored in the business images array
+        return result.filename;
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        throw error;
+    }
+}
 
+// Function to handle image upload
+async function handleBusinessImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Reset the file input
+    const fileInput = event.target;
+    
+    // Show progress bar
+    const progressContainer = document.getElementById('uploadProgressContainer');
+    const progressBar = document.getElementById('uploadProgress');
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+    
+    try {
+        // Show loading state
+        progressBar.style.width = '30%';
+        
+        // Upload the image to server
+        const filename = await uploadImageToServer(file);
+        
+        // Progress animation
+        progressBar.style.width = '90%';
+        
+        // Get the business ID from the form
+        const form = document.getElementById('addListingForm');
+        const businessId = form.getAttribute('data-business-id');
+        
+        if (!businessId) {
+            throw new Error('Business ID not found');
+        }
+        
+        // Add image to business
+        const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/images`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ images: [filename] })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to associate image with business');
+        }
+        
+        // Update progress
+        progressBar.style.width = '100%';
+        
+        // Get updated business details
+        const business = await fetchBusinessDetail(businessId);
+        
+        // Refresh the images display
+        const currentImagesContainer = document.querySelector('.current-images');
+        currentImagesContainer.innerHTML = '';
+        
+        if (business.images && business.images.length > 0) {
+            business.images.forEach(imageUrl => {
+                const imageElement = document.createElement('div');
+                imageElement.className = 'current-image-item';
+                imageElement.innerHTML = `
+                    <img src="${imageUrl}" alt="Business image">
+                    <button type="button" class="remove-image-btn" onclick="removeBusinessImage('${businessId}', '${imageUrl}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                currentImagesContainer.appendChild(imageElement);
+            });
+        } else {
+            currentImagesContainer.innerHTML = '<p>No images available</p>';
+        }
+        
+        // Show success message
+        showToast('Image uploaded successfully', 'success');
+        
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        showToast('Error: ' + error.message, 'error');
+    } finally {
+        // Hide progress bar after a delay
+        setTimeout(() => {
+            const progressContainer = document.getElementById('uploadProgressContainer');
+            progressContainer.style.display = 'none';
+        }, 1000);
+        
+        // Reset file input
+        fileInput.value = '';
+    }
+}
 
-                // Initialize app when page loads
-                document.addEventListener('DOMContentLoaded', init);
-            </script>
-            // ...existing code...
-        </body>
-        </html>iat
+// Function to remove business image
+async function removeBusinessImage(businessId, imageUrl) {
+    if (!confirm('Are you sure you want to remove this image?')) {
+        return;
+    }
+    
+    try {
+        // Get the filename from the URL
+        const filename = imageUrl.split('/').pop();
+        
+        // Send the request to remove the image
+        const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/images/${filename}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to remove image');
+        }
+        
+        // Show success message
+        showToast('Image removed successfully', 'success');
+        
+        // Refresh the business details to update the images
+        const business = await fetchBusinessDetail(businessId);
+        
+        // Update the images display
+        const currentImagesContainer = document.querySelector('.current-images');
+        currentImagesContainer.innerHTML = '';
+        
+        if (business.images && business.images.length > 0) {
+            business.images.forEach(imageUrl => {
+                const imageElement = document.createElement('div');
+                imageElement.className = 'current-image-item';
+                imageElement.innerHTML = `
+                    <img src="${imageUrl}" alt="Business image">
+                    <button type="button" class="remove-image-btn" onclick="removeBusinessImage('${businessId}', '${imageUrl}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                currentImagesContainer.appendChild(imageElement);
+            });
+        } else {
+            currentImagesContainer.innerHTML = '<p>No images available</p>';
+        }
+        
+    } catch (error) {
+        console.error('Error removing image:', error);
+        showToast('Error: ' + error.message, 'error');
+    }
+}
+
+// Add this code to modify the Add Listing tab content HTML when openAdminModal is called
+function enhanceAddListingForm() {
+    // Get the form
+    const form = document.getElementById('addListingForm');
+    
+    // Check if we already have an image section
+    if (form.querySelector('.business-image-section')) {
+        return; // Already enhanced
+    }
+    
+    // Create image section
+    const imageSection = document.createElement('div');
+    imageSection.className = 'business-image-section form-row';
+    imageSection.innerHTML = `
+        <label>Business Images</label>
+        <div class="image-upload-container">
+            <div class="image-upload-box" onclick="document.getElementById('businessImageInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Click to select image</p>
+            </div>
+            <input type="file" id="businessImageInput" accept="image/*" style="display: none">
+            
+            <button type="button" id="uploadImageButton" class="action-btn btn-primary" style="margin-top: 10px; width: 100%; display: none;">
+                <i class="fas fa-upload"></i> Upload Selected Image
+            </button>
+            
+            <div id="uploadProgressContainer" style="display: none; margin-top: 10px; width: 100%;">
+                <div style="background: #f0f0f0; border-radius: 4px; height: 10px; width: 100%;">
+                    <div id="uploadProgress" style="background: var(--primary); height: 10px; width: 0%; border-radius: 4px; transition: width 0.3s;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Container for image preview before upload -->
+        <div id="imagePreviewContainer" style="margin-top: 15px;"></div>
+        
+        <!-- Container for uploaded images -->
+        <div class="uploaded-images-container" style="margin-top: 15px;">
+            <label>Uploaded Images</label>
+            <div class="uploaded-images" id="uploadedImagesContainer"></div>
+            <input type="hidden" id="uploadedFilenames" name="uploadedFilenames" value="">
+        </div>
+    `;
+    
+    // Find where to insert the image section (before form actions)
+    const formActions = form.querySelector('.form-actions');
+    form.insertBefore(imageSection, formActions);
+    
+    // Add event listener for file input change
+    document.getElementById('businessImageInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        // Show preview of the selected image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            previewContainer.innerHTML = `
+                <div class="preview-container">
+                    <p><strong>Selected Image Preview:</strong></p>
+                    <div class="current-image-item preview">
+                        <img src="${e.target.result}" alt="Preview">
+                        <button type="button" class="remove-image-btn" onclick="clearImagePreview()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Show upload button
+            document.getElementById('uploadImageButton').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // Add event listener for upload button
+    document.getElementById('uploadImageButton').addEventListener('click', preUploadImage);
+}
+
+// Function to clear image preview
+function clearImagePreview() {
+    document.getElementById('businessImageInput').value = '';
+    document.querySelector('.current-images').innerHTML = '';
+}
+
+// Update openAdminModal to call enhanceAddListingForm
+const originalOpenAdminModal = openAdminModal;
+openAdminModal = function() {
+    originalOpenAdminModal();
+    enhanceAddListingForm();
+};
+
+// Add these styles to the document
+const imageUploadStyles = document.createElement('style');
+imageUploadStyles.textContent = `
+    .business-image-section {
+        margin-top: 20px;
+    }
+    .current-images {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .current-image-item {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .current-image-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .current-image-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .remove-image-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.8);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .remove-image-btn:hover {
+        background: white;
+        transform: scale(1.1);
+    }
+    .image-upload-box {
+        padding: 25px;
+        border: 2px dashed var(--border);
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--bg-secondary);
+    }
+    .image-upload-box:hover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.05);
+    }
+    .image-upload-box i {
+        font-size: 28px;
+        color: var(--primary);
+        margin-bottom: 10px;
+    }
+`;
+
+document.head.appendChild(imageUploadStyles);
+
+// Function to pre-upload image before form submission
+async function preUploadImage() {
+    const fileInput = document.getElementById('businessImageInput');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        showToast('Please select an image first', 'error');
+        return;
+    }
+    
+    // Show progress bar
+    const progressContainer = document.getElementById('uploadProgressContainer');
+    const progressBar = document.getElementById('uploadProgress');
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+    
+    // Disable upload button
+    const uploadButton = document.getElementById('uploadImageButton');
+    const originalButtonText = uploadButton.innerHTML;
+    uploadButton.innerHTML = '<div class="loading" style="width: 20px; height: 20px; display: inline-block;"></div> Uploading...';
+    uploadButton.disabled = true;
+    
+    try {
+        // Show loading state
+        progressBar.style.width = '30%';
+        
+        // Upload the image to server
+        const filename = await uploadImageToServer(file);
+        
+        // Progress animation
+        progressBar.style.width = '100%';
+        
+        // Add the filename to the list of uploaded files
+        addUploadedFile(filename, URL.createObjectURL(file));
+        
+        // Show success message
+        showToast('Image uploaded successfully', 'success');
+        
+        // Clear the file input and preview
+        clearImagePreview();
+        
+    } catch (error) {
+        console.error('Error pre-uploading image:', error);
+        showToast('Error: ' + error.message, 'error');
+    } finally {
+        // Hide progress bar after a delay
+        setTimeout(() => {
+            progressContainer.style.display = 'none';
+        }, 1000);
+        
+        // Reset upload button
+        uploadButton.innerHTML = originalButtonText;
+        uploadButton.disabled = false;
+        uploadButton.style.display = 'none';
+    }
+}
+
+// Function to add an uploaded file to the list
+function addUploadedFile(filename, previewUrl) {
+    const uploadedImagesContainer = document.getElementById('uploadedImagesContainer');
+    const uploadedFilenamesInput = document.getElementById('uploadedFilenames');
+    
+    // Create a unique ID for this uploaded file
+    const fileId = 'file_' + Date.now();
+    
+    // Create element for the uploaded file
+    const fileElement = document.createElement('div');
+    fileElement.className = 'uploaded-file';
+    fileElement.id = fileId;
+    fileElement.dataset.filename = filename;
+    fileElement.innerHTML = `
+        <div class="current-image-item">
+            <img src="${previewUrl}" alt="Uploaded image">
+            <button type="button" class="remove-image-btn" onclick="removeUploadedFile('${fileId}')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    // Add to container
+    uploadedImagesContainer.appendChild(fileElement);
+    
+    // Update hidden input with filenames
+    let filenames = uploadedFilenamesInput.value ? JSON.parse(uploadedFilenamesInput.value) : [];
+    filenames.push(filename);
+    uploadedFilenamesInput.value = JSON.stringify(filenames);
+    
+    // Add a help message if this is the first image
+    if (uploadedImagesContainer.querySelectorAll('.uploaded-file').length === 1) {
+        const helpMessage = document.createElement('p');
+        helpMessage.className = 'help-message';
+        helpMessage.style.marginTop = '10px';
+        helpMessage.style.fontSize = '14px';
+        helpMessage.style.color = 'var(--text-secondary)';
+        helpMessage.innerHTML = '<i class="fas fa-info-circle"></i> Images will be attached to the business when you submit the form.';
+        uploadedImagesContainer.parentNode.appendChild(helpMessage);
+    }
+}
+
+// Function to remove an uploaded file from the list
+function removeUploadedFile(fileId) {
+    const fileElement = document.getElementById(fileId);
+    if (!fileElement) return;
+    
+    const filename = fileElement.dataset.filename;
+    const uploadedFilenamesInput = document.getElementById('uploadedFilenames');
+    
+    // Remove from DOM
+    fileElement.remove();
+    
+    // Update hidden input with filenames
+    let filenames = uploadedFilenamesInput.value ? JSON.parse(uploadedFilenamesInput.value) : [];
+    filenames = filenames.filter(f => f !== filename);
+    uploadedFilenamesInput.value = JSON.stringify(filenames);
+    
+    // Remove help message if no images left
+    const uploadedImagesContainer = document.getElementById('uploadedImagesContainer');
+    if (uploadedImagesContainer.querySelectorAll('.uploaded-file').length === 0) {
+        const helpMessage = uploadedImagesContainer.parentNode.querySelector('.help-message');
+        if (helpMessage) helpMessage.remove();
+    }
+}
+
+// Function to clear image preview
+function clearImagePreview() {
+    document.getElementById('businessImageInput').value = '';
+    document.getElementById('imagePreviewContainer').innerHTML = '';
+    document.getElementById('uploadImageButton').style.display = 'none';
+}
+const enhancedImageUploadStyles = document.createElement('style');
+enhancedImageUploadStyles.textContent = `
+    .uploaded-images-container {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: rgba(99, 102, 241, 0.05);
+        border: 1px dashed var(--primary);
+    }
+    
+    .uploaded-images {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .uploaded-file {
+        position: relative;
+    }
+    
+    .preview-container {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: var(--bg-secondary);
+    }
+`;
+
+document.head.appendChild(enhancedImageUploadStyles);
+
+// Function to completely reset image upload section
+function resetImageUploadSection() {
+    // Clear file input
+    const fileInput = document.getElementById('businessImageInput');
+    if (fileInput) fileInput.value = '';
+    
+    // Clear image preview
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    if (imagePreviewContainer) imagePreviewContainer.innerHTML = '';
+    
+    // Clear uploaded images
+    const uploadedImagesContainer = document.getElementById('uploadedImagesContainer');
+    if (uploadedImagesContainer) uploadedImagesContainer.innerHTML = '';
+    
+    // Reset hidden filenames input
+    const uploadedFilenamesInput = document.getElementById('uploadedFilenames');
+    if (uploadedFilenamesInput) uploadedFilenamesInput.value = '';
+    
+    // Hide upload button
+    const uploadButton = document.getElementById('uploadImageButton');
+    if (uploadButton) uploadButton.style.display = 'none';
+    
+    // Hide progress bar
+    const progressContainer = document.getElementById('uploadProgressContainer');
+    if (progressContainer) progressContainer.style.display = 'none';
+    
+    // Remove help message if exists
+    const helpMessage = document.querySelector('.uploaded-images-container .help-message');
+    if (helpMessage) helpMessage.remove();
+}
+
+function enhanceFormWithCancelButton() {
+    const formActions = document.querySelector('#addListingForm .form-actions');
+    
+    // First, remove any existing cancel buttons to avoid duplicates
+    const existingCancelButtons = formActions.querySelectorAll('.cancel-btn');
+    existingCancelButtons.forEach(btn => btn.remove());
+    
+    // Also remove the default cancel button that might be there
+    const defaultCancelButton = formActions.querySelector('button[type="button"].action-btn.btn-secondary');
+    if (defaultCancelButton && defaultCancelButton.textContent.includes('Cancel')) {
+        defaultCancelButton.remove();
+    }
+    
+    // Now add a single cancel button at the end
+    if (formActions && !formActions.querySelector('.cancel-btn')) {
+        const cancelButton = document.createElement('button');
+        cancelButton.type = 'button';
+        cancelButton.className = 'action-btn btn-secondary cancel-btn';
+        cancelButton.innerHTML = '<i class="fas fa-times"></i> Cancel';
+        cancelButton.onclick = function() {
+            if (confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
+                document.getElementById('addListingForm').reset();
+                resetImageUploadSection();
+                closeAdminModal();
+            }
+        };
+        
+        formActions.appendChild(cancelButton);
+        
+        // Add some style to position buttons
+        formActions.style.display = 'flex';
+        formActions.style.gap = '10px';
+        formActions.style.justifyContent = 'flex-end';
+        
+        // Submit button should be larger/primary
+        const submitBtn = formActions.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.style.flexGrow = '1';
+        }
+    }
+}
+
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+    </body>
+</html>

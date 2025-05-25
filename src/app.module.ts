@@ -12,12 +12,14 @@ import { LocalStrategy } from './auth/strategies/local.strategy'
 import { AdminController } from './controllers/admin.controller'
 import { BusinessController } from './controllers/business.controller'
 import { CategoryController } from './controllers/category.controller'
+import { fileController } from './controllers/file.controller'
 import { HealthController } from './controllers/health.controller'
 import { SearchController } from './controllers/search.controller'
 import { UserController } from './controllers/user.controller'
 import { AdminService } from './services/admin.service'
 import { BusinessService } from './services/business.service'
 import { CategoryService } from './services/category.service'
+import { fileService } from './services/file.service'
 import { HealthService } from './services/health.service'
 import { RedisModule } from './services/redis.module'
 import { SearchService } from './services/search.service'
@@ -60,6 +62,7 @@ import { UserService } from './services/user.service'
     BusinessController,
     SearchController,
     CategoryController,
+    fileController,
   ],
   providers: [
     JwtStrategy,
@@ -72,6 +75,7 @@ import { UserService } from './services/user.service'
     HealthService,
     BusinessService,
     CategoryService,
+    fileService,
   ],
 })
 export class AppModule {}
